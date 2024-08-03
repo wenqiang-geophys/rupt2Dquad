@@ -315,8 +315,8 @@ ms = 0
 
 u = 0
 ! init wave
-if (.true.) then
-!if (.false.) then
+!if (.true.) then
+if (.false.) then
 do ie = 1,mesh%nelem
     !if (mesh%elemtype(ie) == ELEM_SOLID) then
     !print*,"adding source"
