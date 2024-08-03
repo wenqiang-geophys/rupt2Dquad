@@ -34,3 +34,10 @@
 # bin, obj
 bin
 obj
+
+data
+fort.*
+
+# mesh file
+*.exo
+*.inp
