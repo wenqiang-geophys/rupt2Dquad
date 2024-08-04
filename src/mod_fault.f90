@@ -108,7 +108,7 @@ subroutine fault_init(mesh)
         element = mesh%fault2wave(ief)
         do surface = 1,Nfaces
             !if(mesh%face(surface,element)==FACE_FAULT) then
-            if(mesh%bctype(surface,element)==BC_FAULT) then
+            if(mesh%bctype(surface,element)>=BC_FAULT) then
                 !nelem_fault = nelem_fault + 1
                 !!!!print*,element,surface
                 !!! constant in one element
@@ -173,25 +173,25 @@ subroutine fault_init(mesh)
 
 #ifdef TPV14
                     mesh%mu_s (i,surface,ief) = 0.677
-                    mesh%mu_d (i,surface,iee) = 0.525
-                    mesh%Dc   (i,surface,iee) = 0.4
-                    mesh%C0   (i,surface,iee) = 0.0e6
-                    mesh%tau_n(i,surface,iee) = -120e6
-                    mesh%tau_0(i,surface,iee) = -70e6
+                    mesh%mu_d (i,surface,ief) = 0.525
+                    mesh%Dc   (i,surface,ief) = 0.4
+                    mesh%C0   (i,surface,ief) = 0.0e6
+                    mesh%tau_n(i,surface,ief) = -120e6
+                    mesh%tau_0(i,surface,ief) = -70e6
 
                     asp_size = 1.5e3*(1.0+1e-15)
                     if ( abs(x+8e3) < asp_size ) then
                         mesh%tau_0(i,surface,ief) = -81.24e6 - 1*0.36e6
                     endif
                     ! 100 gap on the branch, main fault normal vector = (0,1)
-                    if ( &
-                            abs(mesh%nx(i,surface,ief)) >1e-3 .and. &
-                            abs(mesh%ny(i,surface,ief)) >1e-3 .and. &
-                            y>-50 .and. &
-                            x<86.602540378443862+1e-3 ) then
-                        mesh%mu_s(i,surface,ief) = 1e4
-                        mesh%C0  (i,surface,ief) = 1e9
-                    endif
+                    !if ( &
+                    !        abs(mesh%nx(i,surface,ief)) >1e-3 .and. &
+                    !        abs(mesh%ny(i,surface,ief)) >1e-3 .and. &
+                    !        y>-50 .and. &
+                    !        x<86.602540378443862+1e-3 ) then
+                    !    mesh%mu_s(i,surface,ief) = 1e4
+                    !    mesh%C0  (i,surface,ief) = 1e9
+                    !endif
 
                     vec_n = (/mesh%nx(i,surface,element),mesh%ny(i,surface,element)/)
                     vec_m = (/-vec_n(2),vec_n(1)/)
@@ -204,6 +204,8 @@ subroutine fault_init(mesh)
 
                     call rotate_xy2nm(vec_n,vec_m,Tx,Ty,Tn,Tm)
 
+                    mesh%tau_n(i,surface,ief) = Tn
+                    mesh%tau_0(i,surface,ief) = Tm
                     !mesh%tau_0(i,surface,element) = Tm
 
                     !if (abs((abs(vec_n(2))-1d0))< 1e-6 ) then
@@ -435,7 +437,7 @@ subroutine fault_init(mesh)
     k = 0
     do i = 1,mesh%nelem
         do is = 1,4
-            if (mesh%bctype(is,i) == BC_FAULT) then
+            if (mesh%bctype(is,i) >= BC_FAULT) then
                 k = k + 1
                 if (is == 1) then
                     xface = mesh%vx(:,1,i)

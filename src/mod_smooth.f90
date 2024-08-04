@@ -31,7 +31,7 @@ subroutine smooth_fault(mesh,u)
     N = NGLL
     do ie = 1,mesh%nelem
         do is = 1,Nfaces
-            if (mesh%bctype(is,ie) == BC_FAULT) then
+            if (mesh%bctype(is,ie) >= BC_FAULT) then
                 Dc = sum(mesh%Dc(:,is,ie))/dble(NGLL)
                 slip = sum(mesh%slip(:,is,ie))/dble(NGLL)
                 beta = min(slip/Dc,1.0)

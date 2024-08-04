@@ -315,7 +315,7 @@ subroutine get_flux(mesh,u,du,i,is,ie,qi,fstar)
     !end if
 
     ! Exx
-    if (mesh%bctype(is,ie) == BC_FAULT) then
+    if (mesh%bctype(is,ie) >= BC_FAULT) then
         alphaV = 1.0
         alphaS = 1.0
     else

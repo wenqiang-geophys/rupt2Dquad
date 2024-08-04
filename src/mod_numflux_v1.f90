@@ -182,7 +182,7 @@ subroutine get_flux(mesh,u,du,i,is,ie,qi,fstar)
         ! deal with neighbors
         if (mesh%bctype(is,ie) == BC_SOLID_SOLID .or. &
                 mesh%bctype(is,ie) == BC_FREE .or. &
-                mesh%bctype(is,ie) == BC_FAULT  &
+                mesh%bctype(is,ie) >= BC_FAULT  &
                  ) then
             call rotate_u(invTv,invTs,uR)
             call rotate_u(invTv,invTs,duR)
@@ -233,7 +233,7 @@ subroutine get_flux(mesh,u,du,i,is,ie,qi,fstar)
          !call numflux1_mod(fL,fR,zp_in,zp_out,zs_in,zs_out,0.1d0,fstar)
     !    fstar = 0.5*cp*(uR-uL) + 1.0*(fR+fL)/2.0 - fL ! LLF flux
     !end if
-    !if (mesh%bctype(is,ie) == BC_FAULT ) then
+    !if (mesh%bctype(is,ie) >= BC_FAULT ) then
     !    alphaV = 1.0
     !    alphaS = 1.0
     !else
@@ -246,7 +246,7 @@ subroutine get_flux(mesh,u,du,i,is,ie,qi,fstar)
     !fstar(4) = 0.0d0
     !fstar(5) = 0.5d0*(fR(5)-fL(5)) + alphaS*0.5d0*(fR(2)-fL(2))/Zs_in
 
-    if (mesh%bctype(is,ie) == BC_FAULT) then
+    if (mesh%bctype(is,ie) >= BC_FAULT) then
         ief = mesh%wave2fault(ie)
         !if (is == 1) then
         !    x = mesh%vx(i,1,ie)
@@ -372,7 +372,7 @@ subroutine get_flux(mesh,u,du,i,is,ie,qi,fstar)
         print*,'error of elemtype'
     end if
     fstar = fstar * norm_vec_n
-    !if (mesh%bctype(is,ie) == BC_FAULT) then
+    !if (mesh%bctype(is,ie) >= BC_FAULT) then
     !print*,fstar(5)
 end subroutine
 

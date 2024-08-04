@@ -230,7 +230,7 @@ enddo
 
 !do i = 1,mesh%nelem
 !    do is = 1,nsurface
-!        if (mesh%bctype(is,i)==BC_FAULT) then
+!        if (mesh%bctype(is,i)>=BC_FAULT) then
 !write(filename,'(a,i6.6,a,i6.6,a)') 'data/fault_mpi',myrank,'_',i,'.txt'
 !            open(2000+myrank*1000+i,file=trim(filename))
 !            if (is == 1) then
@@ -475,7 +475,7 @@ do it = 1,nt
 
     !do i = 1,mesh%nelem
     !    do is = 1,nsurface
-    !        if (mesh%bctype(is,i)==BC_FAULT) then
+    !        if (mesh%bctype(is,i)>=BC_FAULT) then
     !            if (is == 1) then
     !                tmpuface = u(:,1,i,1)
     !            else if (is == 2) then
@@ -493,7 +493,7 @@ do it = 1,nt
     k = 0
     do i = 1,mesh%nelem
         do is = 1,nsurface
-            if (mesh%bctype(is,i)==BC_FAULT) then
+            if (mesh%bctype(is,i)>=BC_FAULT) then
                 k = k + 1
                 mesh%fault_buffer(:,k,1) = mesh%sliprate(:,is,i)
                 !mesh%fault_buffer(:,k,1) = (s(:,is,i)-ms(:,is,i))/dt
@@ -505,7 +505,7 @@ do it = 1,nt
     k = 0
     do i = 1,mesh%nelem
         do is = 1,nsurface
-            if (mesh%bctype(is,i)==BC_FAULT) then
+            if (mesh%bctype(is,i)>=BC_FAULT) then
                 k = k + 1
                 mesh%fault_buffer(:,k,1) = mesh%stress(:,is,i)
                 !mesh%fault_buffer(:,k,1) = (s(:,is,i)-ms(:,is,i))/dt
