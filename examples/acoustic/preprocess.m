@@ -125,6 +125,11 @@ for ie = 1:mesh.nelem
             vp(ie) = 1500*1.5 ;
             vs(ie) = 900*1.5 ;
             rho(ie) = 1000*1.5 ;
+                        
+            vp(ie) = 8000 ;
+            vs(ie) = 4600 ;
+            rho(ie) = 3200 ;
+            
         %elseif (elemtype(ie) == ELEM_FLUID)
         else
             %vp(ie) = 6000;

@@ -40,7 +40,7 @@ varnm = 'Vy'
 
 
 figure('Position',[100 300 800 400])
-for it =   1:11:1000
+for it =  1:11:1000
 
 
     [v1,t] = gather_wave_snap(data_dir, nproc, varnm, it);

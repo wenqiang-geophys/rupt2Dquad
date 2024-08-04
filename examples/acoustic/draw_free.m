@@ -9,6 +9,7 @@ data_dir = 'data';
 
 x = []; y = []; v = [];
 nx = []; ny = [];
+Nt = 35000;
 for i = 1:nproc
 
     fnm = [data_dir,'/free_mpi',num2str(i-1,'%06d'),'.nc'];
@@ -18,8 +19,8 @@ for i = 1:nproc
     y1 = ncread(fnm, 'y');
     nx1 = ncread(fnm, 'nx');
     ny1 = ncread(fnm, 'ny');
-    v1 = ncread(fnm, varnm);
-    t = ncread(fnm, 'time');
+    v1 = ncread(fnm, varnm, [1 1 1],[Inf,Inf,Nt]);
+    t = ncread(fnm, 'time', [1],[Nt]);
     end
 
     %x = [x,x1];
@@ -45,15 +46,18 @@ y = y(:)*1e-3;
 [x,idx] = sort(x);
 v = v(idx,:);
 
+dt = t(2)-t(1);
+u = cumtrapz(v,2)*dt;
+
 figure
-pcolor(x,t, v')
+pcolor(x,t, u')
 shading interp
 c=colorbar;
 
 colormap RdBu
 
 vm = max(abs(v(:)));
-caxis([-1 1]*vm/50)
+%caxis([-1 1]*vm/50)
 xlabel('X (km)')
 ylabel('T (sec)')
 set(gca,'FontSize',12)

@@ -207,20 +207,21 @@ subroutine RHS(mesh,u,qi,ru)
         ru(:,ie,6:8) = 0.1*mesh%dtfactor * ru(:,ie,3:5)
         ru(:,ie,6:8) = 0
 
-        ! add gravity
-        if (mesh%elemtype(ie) == ELEM_FLUID) then
-            !print*,'add body force ...'
-            ! u = (rho*vx rho*vy p/kappa)
-            ! u = (rho*vx rho*vy exx eyy exy)
-#ifdef VERSION1
-            ru(:,ie,2) = ru(:,ie,2) - GRAVITY*rho*(u(:,ie,3))
-            ru(:,ie,3) = ru(:,ie,3) + GRAVITY/chi*u(:,ie,2)
-#else
-            ru(:,ie,2) = ru(:,ie,2) - GRAVITY*rho*(u(:,ie,3)+u(:,ie,4))*(-1)
-            ru(:,ie,3) = ru(:,ie,3) + GRAVITY/chi*u(:,ie,2)
-            ru(:,ie,4) = ru(:,ie,4) + GRAVITY/chi*u(:,ie,2)
-#endif
-        end if
+        ! these terms can be ignored
+!!!        ! add gravity
+!!!        if (mesh%elemtype(ie) == ELEM_FLUID) then
+!!!            !print*,'add body force ...'
+!!!            ! u = (rho*vx rho*vy p/kappa)
+!!!            ! u = (rho*vx rho*vy exx eyy exy)
+!!!#ifdef VERSION1
+!!!            ru(:,ie,2) = ru(:,ie,2) - GRAVITY*rho*(u(:,ie,3))
+!!!            ru(:,ie,3) = ru(:,ie,3) + GRAVITY/chi*u(:,ie,2)
+!!!#else
+!!!            ru(:,ie,2) = ru(:,ie,2) - GRAVITY*rho*(u(:,ie,3)+u(:,ie,4))*(-1)
+!!!            ru(:,ie,3) = ru(:,ie,3) + GRAVITY/chi*u(:,ie,2)
+!!!            ru(:,ie,4) = ru(:,ie,4) + GRAVITY/chi*u(:,ie,2)
+!!!#endif
+!!!        end if
 
     end do ! elem
 
