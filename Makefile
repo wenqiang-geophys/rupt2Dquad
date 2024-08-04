@@ -41,6 +41,7 @@ SRC := mod_para.f90 \
        mod_mpi.f90 \
        mod_exchange.f90 \
        mod_damp.f90 \
+       mod_pml.f90 \
        mod_smooth.f90 \
        mod_source.f90 \
        mod_io_fault.f90 \

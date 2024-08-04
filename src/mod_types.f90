@@ -109,6 +109,14 @@ type :: meshvar
     real(kind=rkind),dimension(:,:,:),pointer :: norm_n => null()
     real(kind=rkind),dimension(:,:,:),pointer :: damp => null()
 
+    ! PML
+    real(kind=rkind),dimension(:,:,:),pointer :: pax => null()
+    real(kind=rkind),dimension(:,:,:),pointer :: pbx => null()
+    real(kind=rkind),dimension(:,:,:),pointer :: pdx => null()
+    real(kind=rkind),dimension(:,:,:),pointer :: pay => null()
+    real(kind=rkind),dimension(:,:,:),pointer :: pby => null()
+    real(kind=rkind),dimension(:,:,:),pointer :: pdy => null()
+
     ! media
     real(kind=rkind),dimension(:),pointer :: vp => null()
     real(kind=rkind),dimension(:),pointer :: vs => null()

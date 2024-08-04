@@ -13,6 +13,7 @@ use mod_fault
 !use mod_source
 !use CMD_Progress
 use mod_damp
+use mod_pml
 use mod_smooth
 use mod_source
 use mod_mpi
@@ -31,6 +32,7 @@ type(meshvar) :: mesh
 type(buffvar) :: buff
 !real(kind=rkind),allocatable,dimension(:,:,:,:) :: u,k1,k2,k3,k4
 real(kind=rkind),allocatable,dimension(:,:,:) :: u,hu,mu,tu
+real(kind=rkind),allocatable,dimension(:,:,:) :: au,hau,mau,tau
 real(kind=rkind),allocatable,dimension(:,:,:) :: s,hs,ms,ts
 real(kind=rkind) :: dt,tmax,minGLL,hmin,hmax,vpmax,vpmin,vsmax,vsmin,rhomax,rhomin
 integer :: myrank,nproc
@@ -118,11 +120,17 @@ data_dir = 'data'
 call write_mesh(mesh,myrank)
 
 call init_damp(mesh,myrank)
+call init_pml(mesh,myrank)
 
 allocate( u(Np,mesh%nelem,8))
 allocate(hu(Np,mesh%nelem,8))
 allocate(mu(Np,mesh%nelem,8))
 allocate(tu(Np,mesh%nelem,8))
+
+allocate( au(Np,mesh%nelem,8))
+allocate(hau(Np,mesh%nelem,8))
+allocate(mau(Np,mesh%nelem,8))
+allocate(tau(Np,mesh%nelem,8))
 
 allocate( s(Nfp,nsurface,mesh%nelem))
 allocate(hs(Nfp,nsurface,mesh%nelem))
