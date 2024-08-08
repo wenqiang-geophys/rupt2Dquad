@@ -41,3 +41,5 @@ fort.*
 # mesh file
 *.exo
 *.inp
+
+#.DS_Store
