@@ -4,6 +4,8 @@ use mod_gll
 use mod_mesh
 !use mod_jacobi
 
+implicit none
+
 contains
 
 subroutine init_pml(mesh,rank)
@@ -11,6 +13,10 @@ subroutine init_pml(mesh,rank)
     integer :: i,j,ie
     integer :: nelem,rank
     real(kind=rkind) :: x1,x2,y1,y2,L,dpx,dpy
+    real(kind=rkind) :: pax,pay,pbx,pby,pdx,pdy
+    real(kind=rkind) :: x,y
+    real(kind=rkind) :: amax,bmax,dmax
+    real(kind=rkind) :: Vp, f0
     real(kind=rkind) :: r,r1
     real(kind=rkind) :: axisLimits(4)
     character(len=80) :: filename
@@ -21,6 +27,14 @@ subroutine init_pml(mesh,rank)
     axisLimits = (/-50d3,50d3,-40d3,40d0/)
     axisLimits = (/-1e30,1e30,-1e30,1e30/) ! no damp
     L = 20d3
+    bmax = 3
+    Vp = 8000
+    f0 = 1
+    dmax = -3*Vp/(2*L)*log(1e-4)
+    amax = pi * f0
+    print*,'amax=',amax
+    print*,'dmax=',dmax
+
 #ifdef TPV5
     axisLimits = (/-30d3,30d3,-20d3,20d3/)
     axisLimits = (/-50d3,50d3,-40d3,40d3/)
@@ -29,6 +43,8 @@ subroutine init_pml(mesh,rank)
     axisLimits = (/-100d3,100d3,-20d3,40000d0/)
     ! acoustic case
     axisLimits = (/-100d3,100d3,-100d3,1d10/)
+    ! fullspace case
+    axisLimits = (/-100d3,100d3,-50d3,1d10/)
     !axisLimits = (/-1e30,1e30,-1e30,1e30/) ! no damp
 #endif
 #ifdef TPV14
@@ -52,44 +68,30 @@ subroutine init_pml(mesh,rank)
     do ie = 1,nelem
         do j = 1,Ngrid
             do i = 1,Ngrid
-                if (mesh%vx(i,j,ie) < x1+L) then
-                    dpx = dexp(-0.1*(mesh%vx(i,j,ie)-(x1+L))**2/L**2)
-                else if (mesh%vx(i,j,ie) >= x1+L .and. mesh%vx(i,j,ie) <= x2-L) then
-                    dpx = 1d0
+                x = mesh%vx(i,j,ie)
+                y = mesh%vy(i,j,ie)
+                ! x direction
+                if (x < x1+L) then
+                    r = x1+L-x
+                elseif (x > x2-L) then
+                    r = x-(x2-L)
                 else
-                    dpx = dexp(-0.1*(mesh%vx(i,j,ie)-(x2-L))**2/L**2)
-                end if
-
-                if (mesh%vy(i,j,ie) < y1+L) then
-                    dpy = dexp(-0.1*(mesh%vy(i,j,ie)-(y1+L))**2/L**2)
+                    r = 0
+                endif
+                mesh%pax(i,j,ie) = amax*(1-r/L)
+                mesh%pbx(i,j,ie) = 1+(bmax-1)*(r/L)**2
+                mesh%pdx(i,j,ie) = dmax*(r/L)**2
+                ! y direction
+                if (y < y1+L) then
+                    r = y1+L-y
+                elseif (y > y2-L) then
+                    r = y-(y2-L)
                 else
-                    dpy = 1d0
-                end if
-#if defined(TPV5) || defined (TPV14)
-                if (mesh%vy(i,j,ie) < y1+L) then
-                    dpy = dexp(-0.1*(mesh%vy(i,j,ie)-(y1+L))**2/L**2)
-                else if (mesh%vy(i,j,ie) >= y1+L .and. mesh%vy(i,j,ie) <= y2-L) then
-                    dpy = 1d0
-                else
-                    dpy = dexp(-0.1*(mesh%vy(i,j,ie)-(y2-L))**2/L**2)
-                end if
-#endif
-
-                ! circle-type damping distribution
-#ifdef TPV14
-                r = dsqrt(mesh%vx(i,j,ie)**2+mesh%vy(i,j,ie)**2)
-                r1 = 40e3
-                L = 10e3
-                if (r > r1) then
-                    dpx = dexp(-0.1*(r-r1)**2/L**2)
-                else
-                    dpx = 1d0
-                end if
-                dpy = 1e30
-#endif
-
-                mesh%pax(i,j,ie) = min(dpx,dpy)
-
+                    r = 0
+                endif
+                mesh%pay(i,j,ie) = amax*(1-r/L)
+                mesh%pby(i,j,ie) = 1+(bmax-1)*(r/L)**2
+                mesh%pdy(i,j,ie) = dmax*(r/L)**2
             end do
         end do
     end do

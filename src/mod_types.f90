@@ -159,6 +159,10 @@ type mytimer
   integer,dimension(8) :: values
 end type
 
+type wavevar
+    real(kind=rkind),dimension(:,:,:),pointer :: u,hu,mu,tu
+end type
+
 contains
 
 end module

@@ -29,11 +29,12 @@ implicit none
 
 integer :: it,nt,irk
 type(meshvar) :: mesh
+type(wavevar) :: wave
 type(buffvar) :: buff
 !real(kind=rkind),allocatable,dimension(:,:,:,:) :: u,k1,k2,k3,k4
-real(kind=rkind),allocatable,dimension(:,:,:) :: u,hu,mu,tu
-real(kind=rkind),allocatable,dimension(:,:,:) :: au,hau,mau,tau
-real(kind=rkind),allocatable,dimension(:,:,:) :: s,hs,ms,ts
+!real(kind=rkind),allocatable,dimension(:,:,:) :: u,hu,mu,tu
+!real(kind=rkind),allocatable,dimension(:,:,:) :: au,hau,mau,tau
+!real(kind=rkind),allocatable,dimension(:,:,:) :: s,hs,ms,ts
 real(kind=rkind) :: dt,tmax,minGLL,hmin,hmax,vpmax,vpmin,vsmax,vsmin,rhomax,rhomin
 integer :: myrank,nproc
 !character(len=80) :: filename
@@ -122,22 +123,22 @@ call write_mesh(mesh,myrank)
 call init_damp(mesh,myrank)
 call init_pml(mesh,myrank)
 
-allocate( u(Np,mesh%nelem,8))
-allocate(hu(Np,mesh%nelem,8))
-allocate(mu(Np,mesh%nelem,8))
-allocate(tu(Np,mesh%nelem,8))
+allocate(wave% u(Np,mesh%nelem,8))
+allocate(wave%hu(Np,mesh%nelem,8))
+allocate(wave%mu(Np,mesh%nelem,8))
+allocate(wave%tu(Np,mesh%nelem,8))
 
-allocate( au(Np,mesh%nelem,8))
-allocate(hau(Np,mesh%nelem,8))
-allocate(mau(Np,mesh%nelem,8))
-allocate(tau(Np,mesh%nelem,8))
+!allocate( au(Np,mesh%nelem,8))
+!allocate(hau(Np,mesh%nelem,8))
+!allocate(mau(Np,mesh%nelem,8))
+!allocate(tau(Np,mesh%nelem,8))
 
-allocate( s(Nfp,nsurface,mesh%nelem))
-allocate(hs(Nfp,nsurface,mesh%nelem))
-allocate(ts(Nfp,nsurface,mesh%nelem))
-allocate(ms(Nfp,nsurface,mesh%nelem))
+!allocate( s(Nfp,nsurface,mesh%nelem))
+!allocate(hs(Nfp,nsurface,mesh%nelem))
+!allocate(ts(Nfp,nsurface,mesh%nelem))
+!allocate(ms(Nfp,nsurface,mesh%nelem))
 
-call init_wave(mesh,u)
+call init_wave(mesh,wave%u)
 call fault_init(mesh)
 !call write_wave(u,myrank,0)
 
@@ -155,6 +156,7 @@ call init_buff(mesh,buff)
 !allocate(qi(Nfp,dimens,mesh%mpi_ne,mesh%mpi_nn))
 
 tmax = 500
+tmax = 50
 !dt = 3.0*mesh%dtfactor
 minGLL = mesh%xnode(2)-mesh%xnode(1)
 !dt = mesh%dtfactor * minGLL / maxval(mesh%vp)
@@ -217,6 +219,7 @@ mesh%dtfactor = dt
 if (myrank==0) print*,'dt = ',sngl(dt),'Tmax = ',sngl(tmax)
 !dt = 1.6d-3
 nt = int(tmax/dt)+1
+!nt = 1
 if (myrank==0) print*,'nt = ',nt
 !print*,'rmin=',minval(mesh%xnode(2:order+1)-mesh%xnode(1:order))
 !print*,'rmax=',maxval(mesh%xnode(2:order+1)-mesh%xnode(1:order))
@@ -315,13 +318,9 @@ end do
 
 mesh%current_timestep = 0
 mesh%current_time = 0d0
-s = 0
-tu = 0
-ts = 0
-mu = 0
-ms = 0
-
-u = 0
+wave%tu = 0
+wave%mu = 0
+wave%u = 0
 ! init wave
 !if (.true.) then
 if (.true.) then
@@ -335,8 +334,8 @@ do ie = 1,mesh%nelem
             amp = 1.0
             r = sqrt((mesh%vx(i,j,ie)-srcx)**2 + (mesh%vy(i,j,ie)-srcy)**2)
             if ( r < 3e3 ) then
-                u(i+(j-1)*Ngrid,ie,3) = amp * exp(-3.0*(r/3e3)**2)
-                u(i+(j-1)*Ngrid,ie,4) = amp * exp(-3.0*(r/3e3)**2)
+                wave%u(i+(j-1)*Ngrid,ie,3) = amp * exp(-3.0*(r/3e3)**2)
+                wave%u(i+(j-1)*Ngrid,ie,4) = amp * exp(-3.0*(r/3e3)**2)
             end if
         end do
     end do
@@ -386,17 +385,15 @@ do it = 1,nt
     !!!    end if
     !!!end if
 
-    mu = u
-    ms = s
-    tu = 0
-    ts = 0
+    wave%mu = wave%u
+    wave%tu = 0
     do irk = 1,5
 
-        call exchange_data(mesh,u,buff)
+        call exchange_data(mesh,wave%u,buff)
 
         !mu = u
         !mu(:,:,3:5) = mu(:,:,3:5) + 0.1*dt*hu(:,:,3:5)
-        call rhs(mesh,u,buff%qi,hu)
+        call rhs(mesh,wave%u,buff%qi,wave%hu)
         !hs = mesh%sliprate
 
         !do i = 1,5
@@ -421,17 +418,15 @@ do it = 1,nt
         !end do
         !end if
 
-        tu = rk4a(irk)*tu + dt*hu
-        !ts = rk4a(irk)*ts + dt*hs
+        wave%tu = rk4a(irk)*wave%tu + dt*wave%hu
         mesh%tslip = rk4a(irk)*mesh%tslip + dt*mesh%sliprate
 
-        u = u + rk4b(irk)*tu
-        !s = s + rk4b(irk)*ts
+        wave%u = wave%u + rk4b(irk)*wave%tu
         mesh%slip = mesh%slip + rk4b(irk)*mesh%tslip
 
         ! artificial damping
         !u(:,:,1:2) = u(:,:,1:2) + 0.3*dt*hu(:,:,1:2)
-        u(:,:,6:8) = damp_s*dt*hu(:,:,3:5) ! save strain rate
+        wave%u(:,:,6:8) = damp_s*dt*wave%hu(:,:,3:5) ! save strain rate
 
         !mesh%slip = s
 
@@ -441,7 +436,7 @@ do it = 1,nt
     end do ! irk
 
     do i = 1,5
-        u(:,:,i) = u(:,:,i) * reshape(mesh%damp,(/Np,mesh%Nelem/))
+        wave%u(:,:,i) = wave%u(:,:,i) * reshape(mesh%damp,(/Np,mesh%Nelem/))
     end do
 
     !call smooth_fault(mesh,u)
@@ -470,8 +465,8 @@ do it = 1,nt
             do j = 1,Ngrid
                 li=lagrange_basis(Ngrid,i,mesh%body_recv_refx(irecv),mesh%xnode)
                 lj=lagrange_basis(Ngrid,j,mesh%body_recv_refy(irecv),mesh%xnode)
-                tmpu1 = tmpu1 + u(i+(j-1)*Ngrid,mesh%body_recv_ie(irecv),1)*li*lj 
-                tmpu2 = tmpu2 + u(i+(j-1)*Ngrid,mesh%body_recv_ie(irecv),2)*li*lj 
+                tmpu1 = tmpu1 + wave%u(i+(j-1)*Ngrid,mesh%body_recv_ie(irecv),1)*li*lj
+                tmpu2 = tmpu2 + wave%u(i+(j-1)*Ngrid,mesh%body_recv_ie(irecv),2)*li*lj
             end do
         end do
         !tmpu1 = tmpu1 / mesh%rho(mesh%body_recv_ie(irecv))
@@ -544,18 +539,18 @@ do it = 1,nt
 
 
     if (mod(it-1,fault_snap_skip) == 0) then
-        call inter_s_io_save(mesh,u,(it-1)/fault_snap_skip+1)
-        call inter_f_io_save(mesh,u,(it-1)/fault_snap_skip+1)
+        call inter_s_io_save(mesh,wave%u,(it-1)/fault_snap_skip+1)
+        call inter_f_io_save(mesh,wave%u,(it-1)/fault_snap_skip+1)
     end if
     if (mod(it-1,fault_snap_skip) == 0) then
-        call free_io_save(mesh,u,(it-1)/fault_snap_skip+1)
+        call free_io_save(mesh,wave%u,(it-1)/fault_snap_skip+1)
     end if
     if (mod(it-1,fault_snap_skip) == 0) then
         call fault_io_save(mesh,(it-1)/fault_snap_skip+1)
     end if
     if (mod(it-1,wave_snap_skip) == 0) then
         if(myrank==0) print*,'writing data/wave_mpi @ it = ',it
-        call wave_io_save(mesh,u,(it-1)/wave_snap_skip+1)
+        call wave_io_save(mesh,wave%u,(it-1)/wave_snap_skip+1)
     end if
 enddo ! it
 

@@ -29,7 +29,8 @@ module mod_exchange
     implicit none
     type(meshvar) :: mesh
     type(buffvar) :: buff
-    real(kind=RKIND),allocatable,dimension(:,:,:) :: u
+    !real(kind=RKIND),allocatable,dimension(:,:,:) :: u
+    real(kind=RKIND),dimension(:,:,:),pointer :: u
 
     integer :: i,j,k,ie,ierr,tag,dest,req,req_r,c,je,face
     !integer :: myrank,nproc,sizes
