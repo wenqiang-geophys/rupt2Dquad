@@ -26,6 +26,11 @@ data_dir = 'data';
 
 [NGLL,~,nelem] = size(x);
 
+x0 = 20e3;
+y0 = -30e3;
+r = sqrt((x-x0).^2+(y-y0).^2);
+[rmin,idx] = min(r(:));
+
 tic
 % fast plot using trisurf
 tri2 = [];
@@ -39,11 +44,16 @@ toc
 varnm = 'Vy'
 
 
-figure('Position',[100 300 800 400])
+%figure('Position',[100 300 800 400])
+figure
+V = [];
 for it =  1:1:1000
 
 
     [v1,t] = gather_wave_snap(data_dir, nproc, varnm, it);
+
+    vv = sum(v1(:).^2);
+    V = [V,vv];
     %v1 = v(:,:,:,it);
     vmax = max(abs(v1(:)));
     plotSolutionFast(tri,x*1e-3,y*1e-3,v1   )
@@ -62,6 +72,7 @@ for it =  1:1:1000
     %ylabel('Depth (km)')
     ylabel('Normal Distance (km)')
     %vmax = 60;
+    %vmax = 50;
     caxis([-1 1]*vmax/2)
     title([varnm, ', T = ',num2str(t),' sec'])
 

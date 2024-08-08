@@ -9,20 +9,24 @@ use mod_numflux
 
 contains
 
-subroutine RHS(mesh,u,qi,ru)
+subroutine RHS(mesh,u,uax,uay,qi,ru,ruax,ruay)
     implicit none
     type(meshvar),intent(inout) :: mesh
     !type(meshvar),intent(in) :: mesh
     real(kind=rkind),intent(in) :: u(:,:,:)
+    real(kind=rkind),intent(in) :: uax(:,:,:)
+    real(kind=rkind),intent(in) :: uay(:,:,:)
     real(kind=rkind),intent(in) :: qi(:,:,:,:)
     real(kind=rkind),intent(inout) :: ru(:,:,:)
+    real(kind=rkind),intent(inout) :: ruax(:,:,:)
+    real(kind=rkind),intent(inout) :: ruay(:,:,:)
     integer :: ie,j,i,iv,isub
     real(kind=rkind),dimension(Ngrid,Ngrid,8) :: q,r
     !real(kind=rkind),dimension(5) :: u1,Fx,Fy,Fr,Fs
     real(kind=rkind),dimension(8) :: Fx,Fy
     !real(kind=rkind),dimension(Ngrid) :: rx1,ry1,sx1,sy1,detJ1
     real(kind=rkind),dimension(Ngrid,Ngrid) :: rx,ry,sx,sy,detJ
-    real(kind=rkind),dimension(Ngrid,Ngrid,8) :: u2d,ru2d,ru2d2
+    real(kind=rkind),dimension(Ngrid,Ngrid,8) :: u2d,uax2d,uay2d,ru2d,ru2d2
     real(kind=rkind),dimension(Ngrid,8) :: Fline
     !real(kind=rkind),dimension(Ngrid,5,5) :: Ar,As
     !real(kind=rkind),dimension(Ngrid,5,5) :: DA
@@ -39,6 +43,7 @@ subroutine RHS(mesh,u,qi,ru)
     integer :: ix(NGLL)
     real(kind=rkind) :: invm
     real(kind=rkind),dimension(NGLL) :: temp1
+    real(kind=rkind),dimension(Np) :: pax,pay,pbx,pby,pdx,pdy
 
 #ifdef FD
     invm = mesh%invMass(1,1) 
@@ -69,6 +74,18 @@ subroutine RHS(mesh,u,qi,ru)
         !    1------2
         !       1
         u2d = reshape(u(:,ie,1:8),(/Ngrid,Ngrid,8/))
+        uax2d = u2d+reshape(uax(:,ie,1:8),(/Ngrid,Ngrid,8/))
+        uay2d = u2d+reshape(uay(:,ie,1:8),(/Ngrid,Ngrid,8/))
+        do i=1,8
+            uax2d(:,:,i) = uax2d(:,:,i)/mesh%pbx(:,:,ie)
+            uay2d(:,:,i) = uay2d(:,:,i)/mesh%pby(:,:,ie)
+        end do
+        pax = reshape(mesh%pax(:,:,ie),(/Np/))
+        pay = reshape(mesh%pay(:,:,ie),(/Np/))
+        pbx = reshape(mesh%pbx(:,:,ie),(/Np/))
+        pby = reshape(mesh%pby(:,:,ie),(/Np/))
+        pdx = reshape(mesh%pdx(:,:,ie),(/Np/))
+        pdy = reshape(mesh%pdy(:,:,ie),(/Np/))
         ru2d = reshape(ru(:,ie,1:8),(/Ngrid,Ngrid,8/)) * 0 * mesh%dtfactor
         ! vel + eta*dt*acc
         !u2d(:,:,1:2) = u2d(:,:,1:2) + 0.3 * mesh%dtfactor * ru2d(:,:,1:2)
@@ -85,8 +102,8 @@ subroutine RHS(mesh,u,qi,ru)
 #ifdef VERSION1
                 if (mesh%elemtype(ie) == ELEM_SOLID) then
 #endif
-                    call Flux1(u2d(i,j,:),ru2d(i,j,:),rho,cp,cs,Fx)
-                    call Flux2(u2d(i,j,:),ru2d(i,j,:),rho,cp,cs,Fy)
+                    call Flux1(uax2d(i,j,:),ru2d(i,j,:),rho,cp,cs,Fx)
+                    call Flux2(uay2d(i,j,:),ru2d(i,j,:),rho,cp,cs,Fy)
 #ifdef VERSION1
                 else if (mesh%elemtype(ie) == ELEM_FLUID) then
                     call Flux1_acoustic(u2d(i,j,:),rho,cp,Fx)
@@ -139,8 +156,8 @@ subroutine RHS(mesh,u,qi,ru)
 #ifdef VERSION1
                 if (mesh%elemtype(ie) == ELEM_SOLID) then
 #endif
-                    call Flux1(u2d(i,j,:),ru2d(i,j,:),rho,cp,cs,Fx)
-                    call Flux2(u2d(i,j,:),ru2d(i,j,:),rho,cp,cs,Fy)
+                    call Flux1(uax2d(i,j,:),ru2d(i,j,:),rho,cp,cs,Fx)
+                    call Flux2(uay2d(i,j,:),ru2d(i,j,:),rho,cp,cs,Fy)
 #ifdef VERSION1
                 else if (mesh%elemtype(ie) == ELEM_FLUID) then
                     call Flux1_acoustic(u2d(i,j,:),rho,cp,Fx)
@@ -206,6 +223,11 @@ subroutine RHS(mesh,u,qi,ru)
         !ru(:,ie,6:8) = 20*mesh%dtfactor * (u(:,ie,6:8)-u(:,ie,3:5))
         ru(:,ie,6:8) = 0.1*mesh%dtfactor * ru(:,ie,3:5)
         ru(:,ie,6:8) = 0
+
+        do iv = 1,5
+            ruax(:,ie,iv) = -(pax+pdx/pbx)*uax(:,ie,iv)-(pdx/pbx)*u(:,ie,iv)
+            ruay(:,ie,iv) = -(pay+pdy/pby)*uay(:,ie,iv)-(pdy/pby)*u(:,ie,iv)
+        end do
 
         ! these terms can be ignored
 !!!        ! add gravity

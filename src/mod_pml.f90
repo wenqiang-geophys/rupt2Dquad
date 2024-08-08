@@ -45,6 +45,7 @@ subroutine init_pml(mesh,rank)
     axisLimits = (/-100d3,100d3,-100d3,1d10/)
     ! fullspace case
     axisLimits = (/-100d3,100d3,-50d3,1d10/)
+    axisLimits = (/-50d3,50d3,-100d3,0d0/)
     !axisLimits = (/-1e30,1e30,-1e30,1e30/) ! no damp
 #endif
 #ifdef TPV14

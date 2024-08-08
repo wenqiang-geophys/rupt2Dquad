@@ -29,7 +29,7 @@ implicit none
 
 integer :: it,nt,irk
 type(meshvar) :: mesh
-type(wavevar) :: wave
+type(wavevar) :: wave, aux, auy
 type(buffvar) :: buff
 !real(kind=rkind),allocatable,dimension(:,:,:,:) :: u,k1,k2,k3,k4
 !real(kind=rkind),allocatable,dimension(:,:,:) :: u,hu,mu,tu
@@ -127,16 +127,14 @@ allocate(wave% u(Np,mesh%nelem,8))
 allocate(wave%hu(Np,mesh%nelem,8))
 allocate(wave%mu(Np,mesh%nelem,8))
 allocate(wave%tu(Np,mesh%nelem,8))
-
-!allocate( au(Np,mesh%nelem,8))
-!allocate(hau(Np,mesh%nelem,8))
-!allocate(mau(Np,mesh%nelem,8))
-!allocate(tau(Np,mesh%nelem,8))
-
-!allocate( s(Nfp,nsurface,mesh%nelem))
-!allocate(hs(Nfp,nsurface,mesh%nelem))
-!allocate(ts(Nfp,nsurface,mesh%nelem))
-!allocate(ms(Nfp,nsurface,mesh%nelem))
+allocate(aux% u(Np,mesh%nelem,8))
+allocate(aux%hu(Np,mesh%nelem,8))
+allocate(aux%mu(Np,mesh%nelem,8))
+allocate(aux%tu(Np,mesh%nelem,8))
+allocate(auy% u(Np,mesh%nelem,8))
+allocate(auy%hu(Np,mesh%nelem,8))
+allocate(auy%mu(Np,mesh%nelem,8))
+allocate(auy%tu(Np,mesh%nelem,8))
 
 call init_wave(mesh,wave%u)
 call fault_init(mesh)
@@ -226,6 +224,7 @@ if (myrank==0) print*,'nt = ',nt
 !print*,'dt = ',dt
 !print*,'dt = ',dt
 tskip = int(0.5/dt)
+tskip = 2
 if(myrank==0) print*,'tskip = ',tskip
 
 wave_snap_skip = tskip
@@ -321,6 +320,14 @@ mesh%current_time = 0d0
 wave%tu = 0
 wave%mu = 0
 wave%u = 0
+aux%u  = 0
+aux%hu = 0
+aux%mu = 0
+aux%tu = 0
+auy%u  = 0
+auy%hu = 0
+auy%mu = 0
+auy%tu = 0
 ! init wave
 !if (.true.) then
 if (.true.) then
@@ -330,7 +337,7 @@ do ie = 1,mesh%nelem
     do j = 1,Ngrid
         do i = 1,Ngrid
             srcx = -0e3
-            srcy = -3e3
+            srcy = -50e3
             amp = 1.0
             r = sqrt((mesh%vx(i,j,ie)-srcx)**2 + (mesh%vy(i,j,ie)-srcy)**2)
             if ( r < 3e3 ) then
@@ -393,7 +400,7 @@ do it = 1,nt
 
         !mu = u
         !mu(:,:,3:5) = mu(:,:,3:5) + 0.1*dt*hu(:,:,3:5)
-        call rhs(mesh,wave%u,buff%qi,wave%hu)
+        call rhs(mesh,wave%u,aux%u,auy%u,buff%qi,wave%hu,aux%hu,auy%hu)
         !hs = mesh%sliprate
 
         !do i = 1,5
@@ -419,9 +426,13 @@ do it = 1,nt
         !end if
 
         wave%tu = rk4a(irk)*wave%tu + dt*wave%hu
-        mesh%tslip = rk4a(irk)*mesh%tslip + dt*mesh%sliprate
-
         wave%u = wave%u + rk4b(irk)*wave%tu
+        aux%tu = rk4a(irk)*aux%tu + dt*aux%hu
+        aux%u = aux%u + rk4b(irk)*aux%tu
+        auy%tu = rk4a(irk)*auy%tu + dt*auy%hu
+        auy%u = auy%u + rk4b(irk)*auy%tu
+
+        mesh%tslip = rk4a(irk)*mesh%tslip + dt*mesh%sliprate
         mesh%slip = mesh%slip + rk4b(irk)*mesh%tslip
 
         ! artificial damping
@@ -435,9 +446,9 @@ do it = 1,nt
 
     end do ! irk
 
-    do i = 1,5
-        wave%u(:,:,i) = wave%u(:,:,i) * reshape(mesh%damp,(/Np,mesh%Nelem/))
-    end do
+    !do i = 1,5
+    !    wave%u(:,:,i) = wave%u(:,:,i) * reshape(mesh%damp,(/Np,mesh%Nelem/))
+    !end do
 
     !call smooth_fault(mesh,u)
 

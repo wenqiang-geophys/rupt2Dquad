@@ -1,6 +1,6 @@
 //+
 SetFactory("OpenCASCADE");
-Rectangle(1) = {-100, 0, 0, 200, -50, 0};
+Rectangle(1) = {-50, 0, 0, 100, -100, 0};
 size = 2;
 MeshSize {:} = size;
 
