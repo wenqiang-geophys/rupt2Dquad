@@ -16,7 +16,7 @@ subroutine init_pml(mesh,rank)
     real(kind=rkind) :: pax,pay,pbx,pby,pdx,pdy
     real(kind=rkind) :: x,y
     real(kind=rkind) :: amax,bmax,dmax
-    real(kind=rkind) :: Vp, f0
+    real(kind=rkind) :: Vp, f0, tmp
     real(kind=rkind) :: r,r1
     real(kind=rkind) :: axisLimits(4)
     character(len=80) :: filename
@@ -67,6 +67,7 @@ subroutine init_pml(mesh,rank)
     allocate(mesh%pdy(Ngrid,Ngrid,nelem))
 
     do ie = 1,nelem
+        mesh%ispml(ie) = 0
         do j = 1,Ngrid
             do i = 1,Ngrid
                 x = mesh%vx(i,j,ie)
@@ -74,28 +75,74 @@ subroutine init_pml(mesh,rank)
                 ! x direction
                 if (x < x1+L) then
                     r = x1+L-x
+                    mesh%ispml(ie) = 1
                 elseif (x > x2-L) then
                     r = x-(x2-L)
+                    mesh%ispml(ie) = 1
                 else
                     r = 0
                 endif
-                mesh%pax(i,j,ie) = amax*(1-r/L)
-                mesh%pbx(i,j,ie) = 1+(bmax-1)*(r/L)**2
-                mesh%pdx(i,j,ie) = dmax*(r/L)**2
+                pax = amax*(1-r/L)
+                if (r==0) pax = 0
+                pbx = 1+(bmax-1)*(r/L)**2
+                pdx = dmax*(r/L)**2
                 ! y direction
                 if (y < y1+L) then
                     r = y1+L-y
+                    mesh%ispml(ie) = 1
                 elseif (y > y2-L) then
                     r = y-(y2-L)
+                    mesh%ispml(ie) = 1
                 else
                     r = 0
                 endif
-                mesh%pay(i,j,ie) = amax*(1-r/L)
-                mesh%pby(i,j,ie) = 1+(bmax-1)*(r/L)**2
-                mesh%pdy(i,j,ie) = dmax*(r/L)**2
+                pay = amax*(1-r/L)
+                if (r==0) pay = 0
+                pby = 1+(bmax-1)*(r/L)**2
+                pdy = dmax*(r/L)**2
+
+                !if (&
+                !        (x<x1+L.and.y<y1+L) .or. &
+                !        (x<x1+L.and.y>y2-L) .or. &
+                !        (x>x2-L.and.y<y1+L) .or. &
+                !        (x>x2-L.and.y>y2-L) ) then
+                !tmp = max(mesh%pax(i,j,ie),mesh%pay(i,j,ie))
+                !tmp = 0
+                !mesh%pax(i,j,ie) = tmp
+                !mesh%pay(i,j,ie) = tmp
+                !tmp = max(mesh%pbx(i,j,ie),mesh%pby(i,j,ie))
+                !tmp = 1
+                !mesh%pbx(i,j,ie) = tmp
+                !mesh%pby(i,j,ie) = tmp
+                !tmp = max(mesh%pdx(i,j,ie),mesh%pdy(i,j,ie))
+                !tmp = 0
+                !mesh%pdx(i,j,ie) = tmp
+                !mesh%pdy(i,j,ie) = tmp
+                !end if
+                ! turn off pml
+                mesh%pax(i,j,ie) = pax
+                mesh%pay(i,j,ie) = pay
+                mesh%pbx(i,j,ie) = pbx
+                mesh%pby(i,j,ie) = pby
+                mesh%pdx(i,j,ie) = pdx+0.0*pdy
+                mesh%pdy(i,j,ie) = pdy+0.0*pdx
+                if (.false.) then
+                mesh%pax(i,j,ie) = 0
+                mesh%pay(i,j,ie) = 0
+                mesh%pbx(i,j,ie) = 1
+                mesh%pby(i,j,ie) = 1
+                mesh%pdx(i,j,ie) = 0
+                mesh%pdy(i,j,ie) = 0
+                end if
+
             end do
         end do
     end do
+
+    write(filename,'(a,i6.6)') 'data/ispml',rank
+    open(100,file=trim(filename),access='stream',form='unformatted',status='unknown')
+    write(100) real(mesh%ispml)
+    close(100)
 
     write(filename,'(a,i6.6)') 'data/pax',rank
     open(100,file=trim(filename),access='stream',form='unformatted',status='unknown')

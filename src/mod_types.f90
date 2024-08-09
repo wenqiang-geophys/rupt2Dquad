@@ -46,6 +46,7 @@ type :: meshvar
     integer,dimension(:,:),pointer :: bctype => null()
     integer,dimension(:,:),pointer :: fluxtype => null()
     integer,dimension(:),pointer :: elemtype => null()
+    integer,dimension(:),pointer :: ispml => null()
     !integer,dimension(:,:,:),pointer :: vmapM => null()
     !integer,dimension(:,:,:),pointer :: vmapP => null()
     integer :: vmapM(Nfp,Nfaces)

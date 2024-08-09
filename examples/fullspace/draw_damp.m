@@ -48,12 +48,15 @@ outdir = data_dir;
 %[~,idx] = min(r(:));
 %recv = [];
 
-fnm = [outdir, '/pax', num2str(iproc-1,'%06d')];
+fnm = [outdir, '/pdy', num2str(iproc-1,'%06d')];
 usize = NGLL*NGLL*nelem*1;
+
+%usize = 1*1*nelem*1;
 
 fid = fopen(fnm,'rb');
 tmp = fread(fid,usize,'float32');
 u{iproc} = reshape(tmp,NGLL,NGLL,nelem);
+%u{iproc} = repmat(reshape(tmp,1,1,nelem),NGLL,NGLL,1);
 fclose(fid);
 end
 

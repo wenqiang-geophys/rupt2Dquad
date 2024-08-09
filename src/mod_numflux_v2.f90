@@ -192,8 +192,11 @@ subroutine get_flux(mesh,u,du,i,is,ie,qi,fstar)
     ! penalty flux
     !if (mesh%bctype(is,ie) == BC_IN) then
     if (.false.) then
-    if (mesh%bctype(is,ie) == BC_IN .and. &
-        mesh%fluxtype(is,ie) == 1) then
+    !if (mesh%bctype(is,ie) == BC_IN .and. &
+    !    mesh%fluxtype(is,ie) == 1) then
+    !if (mesh%bctype(is,ie) == BC_IN .and. &
+    !    mesh%ispml(is,ie) == 1) then
+    if (mesh%ispml(ie)==1) then
         !dQ = uR-uL
         fc(1) = dTx
         fc(2) = dTy
@@ -221,7 +224,7 @@ subroutine get_flux(mesh,u,du,i,is,ie,qi,fstar)
         ! velocity penalties
         fp(3:5) = fc(3:5) + 0.1*fp(3:5)
 
-        fp = fc + 0.002 * 0.5 * cp * (uR-uL) !! LLF
+        fp = fc + 0.2 * 0.5 * cp * (uR-uL) !! LLF
 
         fp = fp * norm_vec_n
 
