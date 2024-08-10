@@ -14,8 +14,10 @@ subroutine init_pml(mesh,rank)
     integer :: nelem,rank
     real(kind=rkind) :: x1,x2,y1,y2,L,dpx,dpy
     real(kind=rkind) :: pax,pay,pbx,pby,pdx,pdy
+    real(kind=rkind) :: pax2,pay2,pbx2,pby2,pdx2,pdy2
     real(kind=rkind) :: x,y
     real(kind=rkind) :: amax,bmax,dmax
+    real(kind=rkind) :: amax2,bmax2,dmax2
     real(kind=rkind) :: Vp, f0, tmp
     real(kind=rkind) :: r,r1
     real(kind=rkind) :: axisLimits(4)
@@ -27,12 +29,17 @@ subroutine init_pml(mesh,rank)
     axisLimits = (/-50d3,50d3,-40d3,40d0/)
     axisLimits = (/-1e30,1e30,-1e30,1e30/) ! no damp
     L = 20d3
-    bmax = 3
-    Vp = 8000
+    Vp = 6000
     f0 = 1
+    amax = pi*0.1
+    bmax = 1
     dmax = -3*Vp/(2*L)*log(1e-4)
-    amax = pi * f0
+    amax2 = pi * 3
+    bmax2 = 3
+    dmax2 = 3*dmax
+
     print*,'amax=',amax
+    print*,'bmax=',bmax
     print*,'dmax=',dmax
 
 #ifdef TPV5
@@ -44,7 +51,7 @@ subroutine init_pml(mesh,rank)
     ! acoustic case
     axisLimits = (/-100d3,100d3,-100d3,1d10/)
     ! fullspace case
-    axisLimits = (/-100d3,100d3,-50d3,1d10/)
+    !axisLimits = (/-100d3,100d3,-50d3,1d10/)
     axisLimits = (/-50d3,50d3,-100d3,0d0/)
     !axisLimits = (/-1e30,1e30,-1e30,1e30/) ! no damp
 #endif
@@ -65,6 +72,12 @@ subroutine init_pml(mesh,rank)
     allocate(mesh%pay(Ngrid,Ngrid,nelem))
     allocate(mesh%pby(Ngrid,Ngrid,nelem))
     allocate(mesh%pdy(Ngrid,Ngrid,nelem))
+    allocate(mesh%pax2(Ngrid,Ngrid,nelem))
+    allocate(mesh%pbx2(Ngrid,Ngrid,nelem))
+    allocate(mesh%pdx2(Ngrid,Ngrid,nelem))
+    allocate(mesh%pay2(Ngrid,Ngrid,nelem))
+    allocate(mesh%pby2(Ngrid,Ngrid,nelem))
+    allocate(mesh%pdy2(Ngrid,Ngrid,nelem))
 
     do ie = 1,nelem
         mesh%ispml(ie) = 0
@@ -83,9 +96,22 @@ subroutine init_pml(mesh,rank)
                     r = 0
                 endif
                 pax = amax*(1-r/L)
-                if (r==0) pax = 0
                 pbx = 1+(bmax-1)*(r/L)**2
                 pdx = dmax*(r/L)**2
+                pax2 = amax2*(1-r/L)
+                pbx2 = 1+(bmax2-1)*(r/L)**2
+                pdx2 = dmax2*(r/L)**2
+                if (r==0) then
+                    pax = 0; pax2 = 0
+                    pbx = 1; pbx2 = 1
+                    pdx = 0; pdx2 = 0
+                end if
+                mesh%pax(i,j,ie) = pax
+                mesh%pbx(i,j,ie) = pbx
+                mesh%pdx(i,j,ie) = pdx
+                mesh%pax2(i,j,ie) = amax2+pdx/pbx
+                mesh%pbx2(i,j,ie) = pbx2
+                mesh%pdx2(i,j,ie) = pdx2
                 ! y direction
                 if (y < y1+L) then
                     r = y1+L-y
@@ -97,9 +123,22 @@ subroutine init_pml(mesh,rank)
                     r = 0
                 endif
                 pay = amax*(1-r/L)
-                if (r==0) pay = 0
                 pby = 1+(bmax-1)*(r/L)**2
                 pdy = dmax*(r/L)**2
+                pay2 = amax2*(1-r/L)
+                pby2 = 1+(bmax2-1)*(r/L)**2
+                pdy2 = dmax2*(r/L)**2
+                if (r==0) then
+                    pay = 0; pay2 = 0
+                    pby = 1; pby2 = 1
+                    pdy = 0; pdy2 = 0
+                end if
+                mesh%pay(i,j,ie) = pay
+                mesh%pby(i,j,ie) = pby
+                mesh%pdy(i,j,ie) = pdy
+                mesh%pay2(i,j,ie) = amax2+pdy/pby
+                mesh%pby2(i,j,ie) = pby2
+                mesh%pdy2(i,j,ie) = pdy2
 
                 !if (&
                 !        (x<x1+L.and.y<y1+L) .or. &
@@ -120,12 +159,6 @@ subroutine init_pml(mesh,rank)
                 !mesh%pdy(i,j,ie) = tmp
                 !end if
                 ! turn off pml
-                mesh%pax(i,j,ie) = pax
-                mesh%pay(i,j,ie) = pay
-                mesh%pbx(i,j,ie) = pbx
-                mesh%pby(i,j,ie) = pby
-                mesh%pdx(i,j,ie) = pdx+0.0*pdy
-                mesh%pdy(i,j,ie) = pdy+0.0*pdx
                 if (.false.) then
                 mesh%pax(i,j,ie) = 0
                 mesh%pay(i,j,ie) = 0

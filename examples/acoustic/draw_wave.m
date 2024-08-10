@@ -40,7 +40,7 @@ varnm = 'Vy'
 
 
 figure('Position',[100 300 800 400])
-for it =  1:11:1000
+for it =  1:1:1000
 
 
     [v1,t] = gather_wave_snap(data_dir, nproc, varnm, it);
@@ -58,10 +58,11 @@ for it =  1:11:1000
     colormap rdbu
 
     %hold off
-    xlabel('Horizontal Distance (km)')
+    xlabel('X (km)')
     %ylabel('Depth (km)')
-    ylabel('Normal Distance (km)')
+    ylabel('Y (km)')
     %vmax = 60;
+    vmax = 100;
     caxis([-1 1]*vmax/2)
     title([varnm, ', T = ',num2str(t),' sec'])
 

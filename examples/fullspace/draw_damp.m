@@ -48,7 +48,7 @@ outdir = data_dir;
 %[~,idx] = min(r(:));
 %recv = [];
 
-fnm = [outdir, '/pdy', num2str(iproc-1,'%06d')];
+fnm = [outdir, '/pby', num2str(iproc-1,'%06d')];
 usize = NGLL*NGLL*nelem*1;
 
 %usize = 1*1*nelem*1;
@@ -64,7 +64,7 @@ end
 figure
 for iproc = 1:nproc
     u1 = u{iproc}(:,:,:);
-    plotSolutionFast(tri{iproc},x{iproc},y{iproc},u1)
+    plotSolutionFast(tri{iproc},x{iproc}*1e-3,y{iproc}*1e-3,u1)
     hold on
 end
 hold off

@@ -117,6 +117,12 @@ type :: meshvar
     real(kind=rkind),dimension(:,:,:),pointer :: pay => null()
     real(kind=rkind),dimension(:,:,:),pointer :: pby => null()
     real(kind=rkind),dimension(:,:,:),pointer :: pdy => null()
+    real(kind=rkind),dimension(:,:,:),pointer :: pax2 => null()
+    real(kind=rkind),dimension(:,:,:),pointer :: pbx2 => null()
+    real(kind=rkind),dimension(:,:,:),pointer :: pdx2 => null()
+    real(kind=rkind),dimension(:,:,:),pointer :: pay2 => null()
+    real(kind=rkind),dimension(:,:,:),pointer :: pby2 => null()
+    real(kind=rkind),dimension(:,:,:),pointer :: pdy2 => null()
 
     ! media
     real(kind=rkind),dimension(:),pointer :: vp => null()

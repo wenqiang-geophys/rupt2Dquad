@@ -31,6 +31,11 @@ y0 = -30e3;
 r = sqrt((x-x0).^2+(y-y0).^2);
 [rmin,idx] = min(r(:));
 
+x0 = 0e3;
+y0 = -50e3;
+r = sqrt((x-x0).^2+(y-y0).^2);
+idx2 = find(abs(x(:)) < 30e3 & abs(y(:))<30e3);
+
 tic
 % fast plot using trisurf
 tri2 = [];
@@ -47,15 +52,19 @@ varnm = 'Vy'
 %figure('Position',[100 300 800 400])
 figure
 V = [];
-for it =  1:1:1000
+ 
+for it = 1:5:1000
 
 
     [v1,t] = gather_wave_snap(data_dir, nproc, varnm, it);
 
+    
     vv = sum(v1(:).^2);
+    %vv = v1(idx);
     V = [V,vv];
     %v1 = v(:,:,:,it);
     vmax = max(abs(v1(:)));
+    vmax = max(vmax,1e-16);
     plotSolutionFast(tri,x*1e-3,y*1e-3,v1   )
     hold on
 

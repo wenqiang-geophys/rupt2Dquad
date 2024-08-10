@@ -8,10 +8,12 @@ Line(5) = {5, 6};
 BooleanFragments{ Surface{1}; Delete; }{ Curve{5}; Delete; }
 
 size=1.5;
+size=3;
 MeshSize {:} = size;
 MeshSize {5, 6} = size*5;
+MeshSize {5, 6} = size*4;
 
 Mesh.Algorithm = 8; // Frontal-Delaunay for quads
 //Mesh.Algorithm = 6; // Frontal-Delaunay
-Mesh.RecombinationAlgorithm = 2; // 2 or 3
+Mesh.RecombinationAlgorithm = 3; // 2 or 3
 Recombine Surface{:};

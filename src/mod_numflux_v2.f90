@@ -8,10 +8,12 @@ use mod_funcs
 
 contains
 
+!subroutine get_flux(mesh,u,uax,uay,du,i,is,ie,qi,fstar)
 subroutine get_flux(mesh,u,du,i,is,ie,qi,fstar)
     implicit none
     ! u(Ngrid,Ngrid,nelem,5)
     real(kind=rkind),intent(in) :: u(:,:,:),qi(:,:,:,:)
+    !real(kind=rkind),intent(in) :: uax(:,:,:), uay(:,:,:)
     real(kind=rkind),intent(in) :: du(:,:,:)
     integer,intent(in) :: i,is,ie
     integer :: j
@@ -104,6 +106,8 @@ subroutine get_flux(mesh,u,du,i,is,ie,qi,fstar)
     elseif (ine == 0) then
         uR(:) = 0 ! absorbing
         duR(:) = 0
+        !uR(1:2) =  uL(1:2)
+        !uR(3:5) = -uL(3:5)
     elseif (ine == -1) then
         !!! set neighbor media !!!
         !print*,'mpi'

@@ -9,24 +9,28 @@ use mod_numflux
 
 contains
 
-subroutine RHS(mesh,u,uax,uay,qi,ru,ruax,ruay)
+subroutine RHS(mesh,u,uax,uay,uax2,uay2,qi,ru,ruax,ruay,ruax2,ruay2)
     implicit none
     type(meshvar),intent(inout) :: mesh
     !type(meshvar),intent(in) :: mesh
     real(kind=rkind),intent(in) :: u(:,:,:)
     real(kind=rkind),intent(in) :: uax(:,:,:)
     real(kind=rkind),intent(in) :: uay(:,:,:)
+    real(kind=rkind),intent(in) :: uax2(:,:,:)
+    real(kind=rkind),intent(in) :: uay2(:,:,:)
     real(kind=rkind),intent(in) :: qi(:,:,:,:)
     real(kind=rkind),intent(inout) :: ru(:,:,:)
     real(kind=rkind),intent(inout) :: ruax(:,:,:)
     real(kind=rkind),intent(inout) :: ruay(:,:,:)
+    real(kind=rkind),intent(inout) :: ruax2(:,:,:)
+    real(kind=rkind),intent(inout) :: ruay2(:,:,:)
     integer :: ie,j,i,iv,isub
     real(kind=rkind),dimension(Ngrid,Ngrid,8) :: q,r
     !real(kind=rkind),dimension(5) :: u1,Fx,Fy,Fr,Fs
     real(kind=rkind),dimension(8) :: Fx,Fy
     !real(kind=rkind),dimension(Ngrid) :: rx1,ry1,sx1,sy1,detJ1
     real(kind=rkind),dimension(Ngrid,Ngrid) :: rx,ry,sx,sy,detJ
-    real(kind=rkind),dimension(Ngrid,Ngrid,8) :: u2d,uax2d,uay2d,ru2d,ru2d2
+    real(kind=rkind),dimension(Ngrid,Ngrid,8) :: u2d,uax2d,uay2d,uax22d,uay22d,ru2d,ru2d2
     real(kind=rkind),dimension(Ngrid,8) :: Fline
     !real(kind=rkind),dimension(Ngrid,5,5) :: Ar,As
     !real(kind=rkind),dimension(Ngrid,5,5) :: DA
@@ -44,6 +48,8 @@ subroutine RHS(mesh,u,uax,uay,qi,ru,ruax,ruay)
     real(kind=rkind) :: invm
     real(kind=rkind),dimension(NGLL) :: temp1
     real(kind=rkind),dimension(Np) :: pax,pay,pbx,pby,pdx,pdy
+    real(kind=rkind),dimension(Np) :: pax2,pay2,pbx2,pby2,pdx2,pdy2
+    real(kind=rkind) :: alpha
 
 #ifdef FD
     invm = mesh%invMass(1,1) 
@@ -74,18 +80,33 @@ subroutine RHS(mesh,u,uax,uay,qi,ru,ruax,ruay)
         !    1------2
         !       1
         u2d = reshape(u(:,ie,1:8),(/Ngrid,Ngrid,8/))
-        uax2d = u2d+reshape(uax(:,ie,1:8),(/Ngrid,Ngrid,8/))
-        uay2d = u2d+reshape(uay(:,ie,1:8),(/Ngrid,Ngrid,8/))
+        uax2d = reshape(uax(:,ie,1:8),(/Ngrid,Ngrid,8/))
+        uay2d = reshape(uay(:,ie,1:8),(/Ngrid,Ngrid,8/))
+        uax22d = reshape(uax2(:,ie,1:8),(/Ngrid,Ngrid,8/))
+        uay22d = reshape(uay2(:,ie,1:8),(/Ngrid,Ngrid,8/))
+        if (mesh%ispml(ie)==1) then
         do i=1,8
-            uax2d(:,:,i) = uax2d(:,:,i)/mesh%pbx(:,:,ie)
-            uay2d(:,:,i) = uay2d(:,:,i)/mesh%pby(:,:,ie)
+            uax2d(:,:,i) = (u2d(:,:,i)+uax2d(:,:,i)+uax22d(:,:,i))/(mesh%pbx(:,:,ie)*mesh%pbx2(:,:,ie))
+            uay2d(:,:,i) = (u2d(:,:,i)+uay2d(:,:,i)+uay22d(:,:,i))/(mesh%pby(:,:,ie)*mesh%pby2(:,:,ie))
+            !uax2d(:,:,i) = (u2d(:,:,i)+uax2d(:,:,i))/mesh%pbx(:,:,ie)+1.0*uayx2d(:,:,i)
+            !uay2d(:,:,i) = (u2d(:,:,i)+uay2d(:,:,i))/mesh%pby(:,:,ie)+1.0*uaxy2d(:,:,i)
         end do
+        else
+            uax2d = u2d
+            uay2d = u2d
+        end if
         pax = reshape(mesh%pax(:,:,ie),(/Np/))
         pay = reshape(mesh%pay(:,:,ie),(/Np/))
         pbx = reshape(mesh%pbx(:,:,ie),(/Np/))
         pby = reshape(mesh%pby(:,:,ie),(/Np/))
         pdx = reshape(mesh%pdx(:,:,ie),(/Np/))
         pdy = reshape(mesh%pdy(:,:,ie),(/Np/))
+        pax2 = reshape(mesh%pax2(:,:,ie),(/Np/))
+        pay2 = reshape(mesh%pay2(:,:,ie),(/Np/))
+        pbx2 = reshape(mesh%pbx2(:,:,ie),(/Np/))
+        pby2 = reshape(mesh%pby2(:,:,ie),(/Np/))
+        pdx2 = reshape(mesh%pdx2(:,:,ie),(/Np/))
+        pdy2 = reshape(mesh%pdy2(:,:,ie),(/Np/))
         ru2d = reshape(ru(:,ie,1:8),(/Ngrid,Ngrid,8/)) * 0 * mesh%dtfactor
         ! vel + eta*dt*acc
         !u2d(:,:,1:2) = u2d(:,:,1:2) + 0.3 * mesh%dtfactor * ru2d(:,:,1:2)
@@ -112,7 +133,10 @@ subroutine RHS(mesh,u,uax,uay,qi,ru,ruax,ruay)
                     print*,'error of elemtype'
                 end if
 #endif
+                !Fx = (Fx+uax2d(i,j,:))/mesh%pbx(i,j,ie)
+                !Fy = (Fy+uay2d(i,j,:))/mesh%pby(i,j,ie)
                 Fline(i,:) = ( rx(i,j)*Fx(:) + ry(i,j)*Fy(:) ) * detJ(i,j)
+                !Fline = Fline + uax2d(i,j,:) * detJ(i,j)
             end do
 #ifdef FD
             do iv = 1,5
@@ -166,7 +190,10 @@ subroutine RHS(mesh,u,uax,uay,qi,ru,ruax,ruay)
                     print*,'error of elemtype'
                 end if
 #endif
+                !Fx = (Fx+uax2d(i,j,:))/mesh%pbx(i,j,ie)
+                !Fy = (Fy+uay2d(i,j,:))/mesh%pby(i,j,ie)
                 Fline(j,:) = ( sx(i,j)*Fx(:) + sy(i,j)*Fy(:) ) * detJ(i,j)
+                !Fline = Fline + uay2d(i,j,:) * detJ(i,j)
             end do
 #ifdef FD
             do iv = 1,5
@@ -224,10 +251,33 @@ subroutine RHS(mesh,u,uax,uay,qi,ru,ruax,ruay)
         ru(:,ie,6:8) = 0.1*mesh%dtfactor * ru(:,ie,3:5)
         ru(:,ie,6:8) = 0
 
+        alpha = 0.3
+
+        if (mesh%ispml(ie)==1) then
+        do i = 1,Np
+            !call Flux1(u(i,ie,:),0*u(i,ie,:),rho,cp,cs,Fx)
+            !call Flux2(u(i,ie,:),0*u(i,ie,:),rho,cp,cs,Fy)
         do iv = 1,5
-            ruax(:,ie,iv) = -(pax+pdx/pbx)*uax(:,ie,iv)-(pdx/pbx)*u(:,ie,iv)
-            ruay(:,ie,iv) = -(pay+pdy/pby)*uay(:,ie,iv)-(pdy/pby)*u(:,ie,iv)
+            alpha = 1-pdx2(i)*pbx(i)/(pbx(i)*(pdx2(i)+pax2(i)*pbx2(i))-pbx2(i)*(pdx(i)+pax(i)*pbx(i)))
+            if (alpha/=alpha) print*,'alpha=',alpha
+            ruax(i,ie,iv) = -(pax(i)+pdx(i)/pbx(i))*uax(i,ie,iv)-(pdx(i)/pbx(i))*u(i,ie,iv)*alpha
+            alpha = 1-pdy2(i)*pby(i)/(pby(i)*(pdy2(i)+pay2(i)*pby2(i))-pby2(i)*(pdy(i)+pay(i)*pby(i)))
+            if (alpha/=alpha) print*,'alpha=',alpha
+            ruay(i,ie,iv) = -(pay(i)+pdy(i)/pby(i))*uay(i,ie,iv)-(pdy(i)/pby(i))*u(i,ie,iv)*alpha
+
+            alpha = 1+pdx(i)*pbx2(i)/(pbx(i)*(pdx2(i)+pax2(i)*pbx2(i))-pbx2(i)*(pdx(i)+pax(i)*pbx(i)))
+            if (alpha/=alpha) print*,'alpha=',alpha
+            ruax2(i,ie,iv) = -(pax2(i)+pdx2(i)/pbx2(i))*uax2(i,ie,iv)-(pdx2(i)/pbx2(i))*u(i,ie,iv)*alpha
+            alpha = 1+pdy(i)*pby2(i)/(pby(i)*(pdy2(i)+pay2(i)*pby2(i))-pby2(i)*(pdy(i)+pay(i)*pby(i)))
+            if (alpha/=alpha) print*,'alpha=',alpha
+            ruay2(i,ie,iv) = -(pay2(i)+pdy2(i)/pby2(i))*uay2(i,ie,iv)-(pdy2(i)/pby2(i))*u(i,ie,iv)*alpha
+            !ruax(i,ie,iv) = -(pax(i)+pdx(i)/pbx(i))*uax(i,ie,iv)-(pdx(i)/pbx(i))*Fx(iv)
+            !ruay(i,ie,iv) = -(pay(i)+pdy(i)/pby(i))*uay(i,ie,iv)-(pdy(i)/pby(i))*Fy(iv)
+            !ruaxy(:,ie,iv) = -alpha*pdy*uaxy(:,ie,iv)-alpha*pdy*u(:,ie,iv)
+            !ruayx(:,ie,iv) = -alpha*pdx*uayx(:,ie,iv)-alpha*pdx*u(:,ie,iv)
         end do
+        end do
+        end if
 
         ! these terms can be ignored
 !!!        ! add gravity

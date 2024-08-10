@@ -29,7 +29,8 @@ implicit none
 
 integer :: it,nt,irk
 type(meshvar) :: mesh
-type(wavevar) :: wave, aux, auy
+type(wavevar) :: wave, aux, auy, auxy, auyx
+type(wavevar) :: aux2, auy2
 type(buffvar) :: buff
 !real(kind=rkind),allocatable,dimension(:,:,:,:) :: u,k1,k2,k3,k4
 !real(kind=rkind),allocatable,dimension(:,:,:) :: u,hu,mu,tu
@@ -135,6 +136,22 @@ allocate(auy% u(Np,mesh%nelem,8))
 allocate(auy%hu(Np,mesh%nelem,8))
 allocate(auy%mu(Np,mesh%nelem,8))
 allocate(auy%tu(Np,mesh%nelem,8))
+allocate(auxy% u(Np,mesh%nelem,8))
+allocate(auxy%hu(Np,mesh%nelem,8))
+allocate(auxy%mu(Np,mesh%nelem,8))
+allocate(auxy%tu(Np,mesh%nelem,8))
+allocate(auyx% u(Np,mesh%nelem,8))
+allocate(auyx%hu(Np,mesh%nelem,8))
+allocate(auyx%mu(Np,mesh%nelem,8))
+allocate(auyx%tu(Np,mesh%nelem,8))
+allocate(aux2% u(Np,mesh%nelem,8))
+allocate(aux2%hu(Np,mesh%nelem,8))
+allocate(aux2%mu(Np,mesh%nelem,8))
+allocate(aux2%tu(Np,mesh%nelem,8))
+allocate(auy2% u(Np,mesh%nelem,8))
+allocate(auy2%hu(Np,mesh%nelem,8))
+allocate(auy2%mu(Np,mesh%nelem,8))
+allocate(auy2%tu(Np,mesh%nelem,8))
 
 call init_wave(mesh,wave%u)
 call fault_init(mesh)
@@ -154,7 +171,7 @@ call init_buff(mesh,buff)
 !allocate(qi(Nfp,dimens,mesh%mpi_ne,mesh%mpi_nn))
 
 tmax = 500
-tmax = 50
+!tmax = 50
 !dt = 3.0*mesh%dtfactor
 minGLL = mesh%xnode(2)-mesh%xnode(1)
 !dt = mesh%dtfactor * minGLL / maxval(mesh%vp)
@@ -328,6 +345,14 @@ auy%u  = 0
 auy%hu = 0
 auy%mu = 0
 auy%tu = 0
+aux2%u  = 0
+aux2%hu = 0
+aux2%mu = 0
+aux2%tu = 0
+auy2%u  = 0
+auy2%hu = 0
+auy2%mu = 0
+auy2%tu = 0
 ! init wave
 !if (.true.) then
 if (.true.) then
@@ -400,7 +425,12 @@ do it = 1,nt
 
         !mu = u
         !mu(:,:,3:5) = mu(:,:,3:5) + 0.1*dt*hu(:,:,3:5)
-        call rhs(mesh,wave%u,aux%u,auy%u,buff%qi,wave%hu,aux%hu,auy%hu)
+        call rhs(mesh,wave%u,&
+                aux%u,auy%u,&
+                aux2%u,auy2%u,&
+                buff%qi,wave%hu,&
+                aux%hu,auy%hu,&
+                aux2%hu,auy2%hu)
         !hs = mesh%sliprate
 
         !do i = 1,5
@@ -427,10 +457,21 @@ do it = 1,nt
 
         wave%tu = rk4a(irk)*wave%tu + dt*wave%hu
         wave%u = wave%u + rk4b(irk)*wave%tu
+
         aux%tu = rk4a(irk)*aux%tu + dt*aux%hu
         aux%u = aux%u + rk4b(irk)*aux%tu
         auy%tu = rk4a(irk)*auy%tu + dt*auy%hu
         auy%u = auy%u + rk4b(irk)*auy%tu
+
+        auxy%tu = rk4a(irk)*auxy%tu + dt*auxy%hu
+        auxy%u = auxy%u + rk4b(irk)*auxy%tu
+        auyx%tu = rk4a(irk)*auyx%tu + dt*auyx%hu
+        auyx%u = auyx%u + rk4b(irk)*auyx%tu
+
+        aux2%tu = rk4a(irk)*aux2%tu + dt*aux2%hu
+        aux2%u = aux2%u + rk4b(irk)*aux2%tu
+        auy2%tu = rk4a(irk)*auy2%tu + dt*auy2%hu
+        auy2%u = auy2%u + rk4b(irk)*auy2%tu
 
         mesh%tslip = rk4a(irk)*mesh%tslip + dt*mesh%sliprate
         mesh%slip = mesh%slip + rk4b(irk)*mesh%tslip
