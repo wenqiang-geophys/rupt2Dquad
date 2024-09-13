@@ -31,12 +31,12 @@ subroutine init_pml(mesh,rank)
     L = 20d3
     Vp = 6000
     f0 = 1
-    amax = pi*0.1
-    bmax = 1
+    amax = pi * f0
+    bmax = bmax
     dmax = -3*Vp/(2*L)*log(1e-4)
-    amax2 = pi * 3
-    bmax2 = 3
-    dmax2 = 3*dmax
+    amax2 = 0
+    bmax2 = 1
+    dmax2 = 0
 
     print*,'amax=',amax
     print*,'bmax=',bmax
@@ -52,6 +52,7 @@ subroutine init_pml(mesh,rank)
     axisLimits = (/-100d3,100d3,-100d3,1d10/)
     ! fullspace case
     !axisLimits = (/-100d3,100d3,-50d3,1d10/)
+    !axisLimits = (/-100d3,100d3,-100d3,0d10/)
     axisLimits = (/-50d3,50d3,-100d3,0d0/)
     !axisLimits = (/-1e30,1e30,-1e30,1e30/) ! no damp
 #endif
@@ -109,7 +110,8 @@ subroutine init_pml(mesh,rank)
                 mesh%pax(i,j,ie) = pax
                 mesh%pbx(i,j,ie) = pbx
                 mesh%pdx(i,j,ie) = pdx
-                mesh%pax2(i,j,ie) = amax2+pdx/pbx
+                !mesh%pax2(i,j,ie) = amax2+pdx/pbx
+                mesh%pax2(i,j,ie) = pax2
                 mesh%pbx2(i,j,ie) = pbx2
                 mesh%pdx2(i,j,ie) = pdx2
                 ! y direction
@@ -136,7 +138,8 @@ subroutine init_pml(mesh,rank)
                 mesh%pay(i,j,ie) = pay
                 mesh%pby(i,j,ie) = pby
                 mesh%pdy(i,j,ie) = pdy
-                mesh%pay2(i,j,ie) = amax2+pdy/pby
+                !mesh%pay2(i,j,ie) = amax2+pdy/pby
+                mesh%pay2(i,j,ie) = pay2
                 mesh%pby2(i,j,ie) = pby2
                 mesh%pdy2(i,j,ie) = pdy2
 

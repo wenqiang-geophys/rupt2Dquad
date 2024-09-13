@@ -5,15 +5,16 @@ use mod_gll
 use mod_fd
 use mod_mesh
 use mod_funcs
+use mod_numflux_pml
 
 contains
 
-!subroutine get_flux(mesh,u,uax,uay,du,i,is,ie,qi,fstar)
-subroutine get_flux(mesh,u,du,i,is,ie,qi,fstar)
+subroutine get_flux(mesh,u,du,uax,uay,i,is,ie,qi,fstar)
+!subroutine get_flux(mesh,u,du,i,is,ie,qi,fstar)
     implicit none
     ! u(Ngrid,Ngrid,nelem,5)
     real(kind=rkind),intent(in) :: u(:,:,:),qi(:,:,:,:)
-    !real(kind=rkind),intent(in) :: uax(:,:,:), uay(:,:,:)
+    real(kind=rkind),intent(in) :: uax(:,:,:), uay(:,:,:)
     real(kind=rkind),intent(in) :: du(:,:,:)
     integer,intent(in) :: i,is,ie
     integer :: j
@@ -143,12 +144,6 @@ subroutine get_flux(mesh,u,du,i,is,ie,qi,fstar)
         !uR(4) = -uL(4)
         uR(5) = -uL(5)
     end if
-    !if (mesh%bctype(is,ie) == BC_FREE_G) then ! free surface with gravity
-    !    ! u = (rho*Vx,rho*Vy,p/kappa)
-    !    uR(:) = 0
-    !    uR(1:2) =  uL(1:2) ! u(2,4,5) is not used
-    !    uR(3) = 2.0*rho*9.8**mesh%eta(i,is,ie)/chi - uL(3)
-    !end if
 
     duL(:) = 0
     duR(:) = 0
@@ -159,10 +154,6 @@ subroutine get_flux(mesh,u,du,i,is,ie,qi,fstar)
     vec_m = (/-ny,nx/)
     norm_vec_n = mesh%norm_n(i,is,ie)
 
-    !if (mesh%ny(i,is,ie)>0) then
-    !call extract_traction_velocity(uL,vec_n,vx_m,vy_m,Tx_m,Ty_m)
-    !call extract_traction_velocity(uR,vec_n,vx_p,vy_p,Tx_p,Ty_p)
-    ! here rho should be rho_m, rho_p
     call extract_traction_velocity_strain(uL(1:5),vec_n,rho,    cp,    cs,    vx_m,vy_m,Tx_m,Ty_m)
     call extract_traction_velocity_strain(uR(1:5),vec_n,rho_out,cp_out,cs_out,vx_p,vy_p,Tx_p,Ty_p)
 #ifdef SYM
@@ -234,6 +225,8 @@ subroutine get_flux(mesh,u,du,i,is,ie,qi,fstar)
 
         fstar = fp
         fstar(6:8) = 0.0
+
+        call get_flux_pml(mesh,u,uax,uay,i,is,ie,qi,fstar)
 
         return
     end if

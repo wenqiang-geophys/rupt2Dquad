@@ -86,8 +86,10 @@ subroutine RHS(mesh,u,uax,uay,uax2,uay2,qi,ru,ruax,ruay,ruax2,ruay2)
         uay22d = reshape(uay2(:,ie,1:8),(/Ngrid,Ngrid,8/))
         if (mesh%ispml(ie)==1) then
         do i=1,8
-            uax2d(:,:,i) = (u2d(:,:,i)+uax2d(:,:,i)+uax22d(:,:,i))/(mesh%pbx(:,:,ie)*mesh%pbx2(:,:,ie))
-            uay2d(:,:,i) = (u2d(:,:,i)+uay2d(:,:,i)+uay22d(:,:,i))/(mesh%pby(:,:,ie)*mesh%pby2(:,:,ie))
+            !uax2d(:,:,i) = (u2d(:,:,i)+uax2d(:,:,i)+uax22d(:,:,i))/(mesh%pbx(:,:,ie)*mesh%pbx2(:,:,ie))
+            !uay2d(:,:,i) = (u2d(:,:,i)+uay2d(:,:,i)+uay22d(:,:,i))/(mesh%pby(:,:,ie)*mesh%pby2(:,:,ie))
+            uax2d(:,:,i) = (u2d(:,:,i)+uax2d(:,:,i))/(mesh%pbx(:,:,ie))
+            uay2d(:,:,i) = (u2d(:,:,i)+uay2d(:,:,i))/(mesh%pby(:,:,ie))
             !uax2d(:,:,i) = (u2d(:,:,i)+uax2d(:,:,i))/mesh%pbx(:,:,ie)+1.0*uayx2d(:,:,i)
             !uay2d(:,:,i) = (u2d(:,:,i)+uay2d(:,:,i))/mesh%pby(:,:,ie)+1.0*uaxy2d(:,:,i)
         end do
@@ -159,9 +161,9 @@ subroutine RHS(mesh,u,uax,uay,uax2,uay2,qi,ru,ruax,ruay,ruax2,ruay2)
             end do
 #endif
 
-            call get_flux(mesh,u,ru,j,4,ie,qi,fstar)
+            call get_flux(mesh,u,ru,uax,uay,j,4,ie,qi,fstar)
             temp(1,:) = temp(1,:) + invm * fstar
-            call get_flux(mesh,u,ru,j,2,ie,qi,fstar)
+            call get_flux(mesh,u,ru,uax,uay,j,2,ie,qi,fstar)
             temp(Ngrid,:) = temp(Ngrid,:) + invm * fstar
 
             if (.false.) then
@@ -216,9 +218,9 @@ subroutine RHS(mesh,u,uax,uay,uax2,uay2,qi,ru,ruax,ruay,ruax2,ruay2)
             end do
 #endif
 
-            call get_flux(mesh,u,ru,i,1,ie,qi,fstar)
+            call get_flux(mesh,u,ru,uax,uay,i,1,ie,qi,fstar)
             temp(1,:) = temp(1,:) + invm * fstar
-            call get_flux(mesh,u,ru,i,3,ie,qi,fstar)
+            call get_flux(mesh,u,ru,uax,uay,i,3,ie,qi,fstar)
             temp(Ngrid,:) = temp(Ngrid,:) + invm * fstar
 
             if (.false.) then
@@ -258,19 +260,21 @@ subroutine RHS(mesh,u,uax,uay,uax2,uay2,qi,ru,ruax,ruay,ruax2,ruay2)
             !call Flux1(u(i,ie,:),0*u(i,ie,:),rho,cp,cs,Fx)
             !call Flux2(u(i,ie,:),0*u(i,ie,:),rho,cp,cs,Fy)
         do iv = 1,5
-            alpha = 1-pdx2(i)*pbx(i)/(pbx(i)*(pdx2(i)+pax2(i)*pbx2(i))-pbx2(i)*(pdx(i)+pax(i)*pbx(i)))
+            !alpha = 1-pdx2(i)*pbx(i)/(pbx(i)*(pdx2(i)+pax2(i)*pbx2(i))-pbx2(i)*(pdx(i)+pax(i)*pbx(i)))
+            alpha = 1.
             if (alpha/=alpha) print*,'alpha=',alpha
             ruax(i,ie,iv) = -(pax(i)+pdx(i)/pbx(i))*uax(i,ie,iv)-(pdx(i)/pbx(i))*u(i,ie,iv)*alpha
-            alpha = 1-pdy2(i)*pby(i)/(pby(i)*(pdy2(i)+pay2(i)*pby2(i))-pby2(i)*(pdy(i)+pay(i)*pby(i)))
+            !alpha = 1-pdy2(i)*pby(i)/(pby(i)*(pdy2(i)+pay2(i)*pby2(i))-pby2(i)*(pdy(i)+pay(i)*pby(i)))
+            alpha = 1.
             if (alpha/=alpha) print*,'alpha=',alpha
             ruay(i,ie,iv) = -(pay(i)+pdy(i)/pby(i))*uay(i,ie,iv)-(pdy(i)/pby(i))*u(i,ie,iv)*alpha
 
-            alpha = 1+pdx(i)*pbx2(i)/(pbx(i)*(pdx2(i)+pax2(i)*pbx2(i))-pbx2(i)*(pdx(i)+pax(i)*pbx(i)))
-            if (alpha/=alpha) print*,'alpha=',alpha
-            ruax2(i,ie,iv) = -(pax2(i)+pdx2(i)/pbx2(i))*uax2(i,ie,iv)-(pdx2(i)/pbx2(i))*u(i,ie,iv)*alpha
-            alpha = 1+pdy(i)*pby2(i)/(pby(i)*(pdy2(i)+pay2(i)*pby2(i))-pby2(i)*(pdy(i)+pay(i)*pby(i)))
-            if (alpha/=alpha) print*,'alpha=',alpha
-            ruay2(i,ie,iv) = -(pay2(i)+pdy2(i)/pby2(i))*uay2(i,ie,iv)-(pdy2(i)/pby2(i))*u(i,ie,iv)*alpha
+            !alpha = 1+pdx(i)*pbx2(i)/(pbx(i)*(pdx2(i)+pax2(i)*pbx2(i))-pbx2(i)*(pdx(i)+pax(i)*pbx(i)))
+            !if (alpha/=alpha) print*,'alpha=',alpha
+            !ruax2(i,ie,iv) = -(pax2(i)+pdx2(i)/pbx2(i))*uax2(i,ie,iv)-(pdx2(i)/pbx2(i))*u(i,ie,iv)*alpha
+            !alpha = 1+pdy(i)*pby2(i)/(pby(i)*(pdy2(i)+pay2(i)*pby2(i))-pby2(i)*(pdy(i)+pay(i)*pby(i)))
+            !if (alpha/=alpha) print*,'alpha=',alpha
+            !ruay2(i,ie,iv) = -(pay2(i)+pdy2(i)/pby2(i))*uay2(i,ie,iv)-(pdy2(i)/pby2(i))*u(i,ie,iv)*alpha
             !ruax(i,ie,iv) = -(pax(i)+pdx(i)/pbx(i))*uax(i,ie,iv)-(pdx(i)/pbx(i))*Fx(iv)
             !ruay(i,ie,iv) = -(pay(i)+pdy(i)/pby(i))*uay(i,ie,iv)-(pdy(i)/pby(i))*Fy(iv)
             !ruaxy(:,ie,iv) = -alpha*pdy*uaxy(:,ie,iv)-alpha*pdy*u(:,ie,iv)

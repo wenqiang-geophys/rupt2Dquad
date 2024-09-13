@@ -35,6 +35,7 @@ SRC := mod_para.f90 \
        mod_mesh.f90 \
        mod_geometry.f90 \
        mod_funcs.f90 \
+       mod_numflux_pml.f90 \
        mod_numflux_v2.f90 \
        mod_wave.f90 \
        mod_fault.f90 \
