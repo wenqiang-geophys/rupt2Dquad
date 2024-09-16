@@ -84,7 +84,7 @@ subroutine RHS(mesh,u,uax,uay,uax2,uay2,qi,ru,ruax,ruay,ruax2,ruay2)
         uay2d = reshape(uay(:,ie,1:8),(/Ngrid,Ngrid,8/))
         uax22d = reshape(uax2(:,ie,1:8),(/Ngrid,Ngrid,8/))
         uay22d = reshape(uay2(:,ie,1:8),(/Ngrid,Ngrid,8/))
-        if (mesh%ispml(ie)==1) then
+        if (mesh%ispml(ie)==1 .and. use_pml==1) then
         do i=1,8
             !uax2d(:,:,i) = (u2d(:,:,i)+uax2d(:,:,i)+uax22d(:,:,i))/(mesh%pbx(:,:,ie)*mesh%pbx2(:,:,ie))
             !uay2d(:,:,i) = (u2d(:,:,i)+uay2d(:,:,i)+uay22d(:,:,i))/(mesh%pby(:,:,ie)*mesh%pby2(:,:,ie))
@@ -97,6 +97,7 @@ subroutine RHS(mesh,u,uax,uay,uax2,uay2,qi,ru,ruax,ruay,ruax2,ruay2)
             uax2d = u2d
             uay2d = u2d
         end if
+        if (use_pml==1) then
         pax = reshape(mesh%pax(:,:,ie),(/Np/))
         pay = reshape(mesh%pay(:,:,ie),(/Np/))
         pbx = reshape(mesh%pbx(:,:,ie),(/Np/))
@@ -109,6 +110,7 @@ subroutine RHS(mesh,u,uax,uay,uax2,uay2,qi,ru,ruax,ruay,ruax2,ruay2)
         pby2 = reshape(mesh%pby2(:,:,ie),(/Np/))
         pdx2 = reshape(mesh%pdx2(:,:,ie),(/Np/))
         pdy2 = reshape(mesh%pdy2(:,:,ie),(/Np/))
+        end if
         ru2d = reshape(ru(:,ie,1:8),(/Ngrid,Ngrid,8/)) * 0 * mesh%dtfactor
         ! vel + eta*dt*acc
         !u2d(:,:,1:2) = u2d(:,:,1:2) + 0.3 * mesh%dtfactor * ru2d(:,:,1:2)
@@ -255,7 +257,7 @@ subroutine RHS(mesh,u,uax,uay,uax2,uay2,qi,ru,ruax,ruay,ruax2,ruay2)
 
         alpha = 0.3
 
-        if (mesh%ispml(ie)==1) then
+        if (mesh%ispml(ie)==1 .and. use_pml==1) then
         do i = 1,Np
             !call Flux1(u(i,ie,:),0*u(i,ie,:),rho,cp,cs,Fx)
             !call Flux2(u(i,ie,:),0*u(i,ie,:),rho,cp,cs,Fy)

@@ -20,9 +20,9 @@ order = 1;
 fnm = 'tpv5_2d.exo';
 elem = ncread(fnm,'connect6');
 elem_fault = ncread(fnm,'connect1');
-fnm = 'tpv5_2d_symm.exo';
-elem = ncread(fnm,'connect10');
-elem_fault = ncread(fnm,'connect1');
+% fnm = 'tpv5_2d_symm.exo';
+% elem = ncread(fnm,'connect10');
+% elem_fault = ncread(fnm,'connect1');
 coord = ncread(fnm,'coord');
 node = coord(:,1:2);
 elem = elem';
@@ -47,20 +47,22 @@ node = mesh.node;
 EtoE = mesh.EtoE;
 EtoF = mesh.EtoF;
 
-nelem = mesh.nelem;
-nnode = mesh.nnode;
+Nelem = mesh.Nelem;
+Nnode = mesh.Nnode;
 
-bctype = zeros(4,mesh.nelem);
-elemtype = zeros(1,mesh.nelem);
+bctype = zeros(4,mesh.Nelem);
+elemtype = zeros(1,mesh.Nelem);
 elemtype(:) = ELEM_SOLID;
-vp = zeros(1,mesh.nelem);
-vs = zeros(1,mesh.nelem);
-rho = zeros(1,mesh.nelem);
+vp = zeros(1,mesh.Nelem);
+vs = zeros(1,mesh.Nelem);
+rho = zeros(1,mesh.Nelem);
 vp(:) = 6000;
 vs(:) = 3464;
 rho(:) = 2670;
 bctype = set_bctype_from_curve(elem,elem_fault);
-%for ie = 1:mesh.nelem
+mesh.Nelem_fault = sum(bctype(:)>=BC_FAULT);
+mesh.Nelem_free = sum(bctype(:)==BC_FREE);
+%for ie = 1:mesh.Nelem
 %    for is = 1:4
 %        is1 = is + 1;
 %        if (is1 > 4)
@@ -174,7 +176,7 @@ for i = 1:nrecv
     y = recv(i,2);
     r = sqrt((mesh.x(:)-x).^2+(mesh.y(:)-y).^2);
     [~,idx]=min(r);
-    [recv_i,recv_j,recv_ie(i)] = ind2sub([NGLL,NGLL,nelem],idx);
+    [recv_i,recv_j,recv_ie(i)] = ind2sub([NGLL,NGLL,Nelem],idx);
     %%%%recv_is = find(bctype(:,recv_ie(i))==-3,1);
     recv_is = find(bctype(:,recv_ie(i))>=BC_FAULT,1);
     if ((recv_is==1) | (recv_is == 3))
@@ -239,7 +241,7 @@ mesh.recv_refx = recv_refx;
 %    y = recv(i,2);
 %    r = sqrt((mesh.x(:)-x).^2+(mesh.y(:)-y).^2);
 %    [~,idx]=min(r);
-%    [recv_i,recv_j,recv_ie(i)] = ind2sub([NGLL,NGLL,nelem],idx);
+%    [recv_i,recv_j,recv_ie(i)] = ind2sub([NGLL,NGLL,Nelem],idx);
 %    %%%%recv_is = find(bctype(:,recv_ie(i))==-3,1);
 %    recv_is = find(bctype(:,recv_ie(i))==-3,1);
 %    if ((recv_is==1) | (recv_is == 3))
@@ -332,8 +334,8 @@ for i = 1:nrecv
     y = recv(i,2);
     r = sqrt((mesh.x(:)-x).^2+(mesh.y(:)-y).^2);
     [~,idx]=min(r);
-    %[recv_i(i),recv_j(i),recv_ie(i)] = ind2sub([NGLL,NGLL,nelem],idx);
-    for ie = 1:mesh.nelem
+    %[recv_i(i),recv_j(i),recv_ie(i)] = ind2sub([NGLL,NGLL,Nelem],idx);
+    for ie = 1:mesh.Nelem
         VX = mesh.node(1,mesh.elem(:,ie));
         VY = mesh.node(2,mesh.elem(:,ie));
         in = inpolygon(x,y,VX,VY);
@@ -370,8 +372,8 @@ if 0
    end
 end
 
-
-db = gen_mesh_mpi_v5(mesh,nproc);
+system('mkdir -p data');
+db = gen_mesh_mpi_v6(mesh,nproc);
 
 
 %% check local node and elem ...
@@ -476,7 +478,7 @@ end
 %%return
 % 
 %for iproc = 1
-%    for ie = 1:db(iproc).nelem
+%    for ie = 1:db(iproc).Nelem
 %        for is = 1:4
 %            neigh = db(iproc).neighbor(is,ie);
 %            if (neigh == -1)

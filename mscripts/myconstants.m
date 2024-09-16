@@ -1,4 +1,6 @@
 
+Nfaces = 4;
+
 BC_IN             = 0;
 BC_SOLID_SOLID    = 0;
 BC_FLUID_FLUID    = 1;
@@ -10,4 +12,6 @@ BC_FAULT          = 100;
 
 ELEM_SOLID = 0;
 ELEM_FLUID = 1;
+
+FtoV = [1,2;2,3;3,4;4,1];
 

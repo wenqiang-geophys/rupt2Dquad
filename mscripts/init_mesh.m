@@ -21,8 +21,8 @@ function mesh = init_mesh(mesh, order)
 %[node,elem] = read_mesh2(basename);
 node = mesh.node;
 elem = mesh.elem;
-nelem = size(elem,1);
-nnode = size(node,1);
+Nelem = size(elem,1);
+Nnode = size(node,1);
 
 elem = ccw_sort(node,elem);
 
@@ -39,8 +39,8 @@ end
 direction = get_face_direction(node,elem,EtoE,EtoF);
 [x,y] = nodes2d(order,node,elem,xnode);
 
-mesh.nelem = nelem;
-mesh.nnode = nnode;
+mesh.Nelem = Nelem;
+mesh.Nnode = Nnode;
 
 mesh.node = node';
 mesh.elem = elem';
@@ -52,17 +52,17 @@ mesh.x = x;
 mesh.y = y;
 
 %disp('calculating metrics...')
-%xr = zeros(order+1,order+1,nelem);
-%xs = zeros(order+1,order+1,nelem);
-%yr = zeros(order+1,order+1,nelem);
-%ys = zeros(order+1,order+1,nelem);
-%detJ = zeros(order+1,order+1,nelem);
-%J = zeros(2,2,order+1,order+1,nelem);
-%invJ = zeros(2,2,order+1,order+1,nelem);
+%xr = zeros(order+1,order+1,Nelem);
+%xs = zeros(order+1,order+1,Nelem);
+%yr = zeros(order+1,order+1,Nelem);
+%ys = zeros(order+1,order+1,Nelem);
+%detJ = zeros(order+1,order+1,Nelem);
+%J = zeros(2,2,order+1,order+1,Nelem);
+%invJ = zeros(2,2,order+1,order+1,Nelem);
 %
 %[r,s]=meshgrid(xnode,xnode);
 %r = r'; s = s';
-%for i = 1:nelem
+%for i = 1:Nelem
 %%    xr(:,:,i) = D1 * squeeze(x(:,:,i));
 %%    xs(:,:,i) = transpose(D1*transpose(squeeze(x(:,:,i))));
 %%    yr(:,:,i) = D1 * squeeze(y(:,:,i));
@@ -87,7 +87,7 @@ mesh.y = y;
 %J(1,2,:,:,:) = yr;
 %J(2,2,:,:,:) = ys;
 %
-%for ex = 1:nelem
+%for ex = 1:Nelem
 %    for i = 1:order+1
 %        for j = 1:order+1
 %            detJ(i,j,ex) = det(squeeze(J(:,:,i,j,ex)));
@@ -101,9 +101,9 @@ mesh.y = y;
 %sx = squeeze(invJ(1,2,:,:,:));
 %sy = squeeze(invJ(2,2,:,:,:));
 %
-%nx = zeros(4,order+1,nelem);
-%ny = zeros(4,order+1,nelem);
-%norm_n = zeros(4,order+1,nelem);
+%nx = zeros(4,order+1,Nelem);
+%ny = zeros(4,order+1,Nelem);
+%norm_n = zeros(4,order+1,Nelem);
 %
 %%       3
 %%    4------3
@@ -120,7 +120,7 @@ mesh.y = y;
 %nx(3,:,:) =  detJ(:,end,:)  .*sx(:,end,:);
 %ny(3,:,:) =  detJ(:,end,:)  .*sy(:,end,:);
 %
-%for ie = 1:nelem
+%for ie = 1:Nelem
 %    for i = 1:order+1
 %        for is = 1:4
 %            if (is == 1) 

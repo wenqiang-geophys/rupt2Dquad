@@ -60,6 +60,7 @@ real(kind=rkind) :: src_dist
 integer :: fault_snap_skip
 integer :: wave_snap_skip
 
+use_pml = 0
 fault_snap_skip = 1
 wave_snap_skip = 1
 
@@ -170,7 +171,7 @@ call init_buff(mesh,buff)
 !allocate(q_rec(Nfp*mesh%mpi_ne*dimens,mesh%mpi_nn))
 !allocate(qi(Nfp,dimens,mesh%mpi_ne,mesh%mpi_nn))
 
-tmax = 500
+tmax = 10
 !tmax = 50
 !dt = 3.0*mesh%dtfactor
 minGLL = mesh%xnode(2)-mesh%xnode(1)
@@ -241,7 +242,7 @@ if (myrank==0) print*,'nt = ',nt
 !print*,'dt = ',dt
 !print*,'dt = ',dt
 tskip = int(0.5/dt)
-tskip = 2
+!tskip = 2
 if(myrank==0) print*,'tskip = ',tskip
 
 wave_snap_skip = tskip
@@ -355,7 +356,7 @@ auy2%mu = 0
 auy2%tu = 0
 ! init wave
 !if (.true.) then
-if (.true.) then
+if (.false.) then
 do ie = 1,mesh%nelem
     !if (mesh%elemtype(ie) == ELEM_SOLID) then
     !print*,"adding source"
@@ -458,6 +459,7 @@ do it = 1,nt
         wave%tu = rk4a(irk)*wave%tu + dt*wave%hu
         wave%u = wave%u + rk4b(irk)*wave%tu
 
+        if (use_pml==1) then
         aux%tu = rk4a(irk)*aux%tu + dt*aux%hu
         aux%u = aux%u + rk4b(irk)*aux%tu
         auy%tu = rk4a(irk)*auy%tu + dt*auy%hu
@@ -472,6 +474,7 @@ do it = 1,nt
         aux2%u = aux2%u + rk4b(irk)*aux2%tu
         auy2%tu = rk4a(irk)*auy2%tu + dt*auy2%hu
         auy2%u = auy2%u + rk4b(irk)*auy2%tu
+        endif
 
         mesh%tslip = rk4a(irk)*mesh%tslip + dt*mesh%sliprate
         mesh%slip = mesh%slip + rk4b(irk)*mesh%tslip

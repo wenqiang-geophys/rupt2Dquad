@@ -4,27 +4,31 @@ clear
 
 nproc = 4;
 varnm = 'stress';
+varnm = 'rate';
 %data_dir = 'data_500_20000_v1'
 data_dir = 'data'
 %data_dir = 'data_500_20000_llf_pOrder8'
 
-key1 = 'symm_upwind'
-data_dir = ['data_',key1];
+%key1 = 'symm_upwind'
+%data_dir = ['data_',key1];
+
 
 x = []; y = []; v = [];
 for i = 1:nproc
 
     fnm = [data_dir,'/fault_mpi',num2str(i-1,'%06d'),'.nc'];
-    if (exist(fnm))
+    if (exist(fnm,'file'))
+        disp(fnm)
     x1 = ncread(fnm, 'x');
     y1 = ncread(fnm, 'y');
     v1 = ncread(fnm, varnm);
     t = ncread(fnm, 'time');
-    end
+    
 
     x = [x,x1];
     y = [y,y1];
     v = [v,v1];
+    end
 
 end
 
@@ -61,5 +65,5 @@ xlabel('X (km)')
 ylabel('T (sec)')
 set(gca,'FontSize',12)
 %fnm = ['fault_x_t_mesh_asymm_mixed_',varnm];
-fnm = ['fault_x_t_mesh_',key1,'_',varnm];
-print( '-r300', '-dpng', fnm)
+%fnm = ['fault_x_t_mesh_',key1,'_',varnm];
+%print( '-r300', '-dpng', fnm)

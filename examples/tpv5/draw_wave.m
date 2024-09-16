@@ -45,7 +45,7 @@ for it =   1:1:1000
     [v1,t] = gather_wave_snap(data_dir, nproc, 'Vx', it);
     %v1 = v(:,:,:,it);
     vmax = max(abs(v1(:)));
-    plotSolutionFast(tri,x*1e-3,y*1e-3,v1,1   )
+    plotSolutionFast(tri,x*1e-3,y*1e-3,v1  )
   
 
     colormap rdbu
@@ -55,6 +55,7 @@ for it =   1:1:1000
     %ylabel('Depth (km)')
     ylabel('Normal Distance (km)')
     %vmax = 60;
+    vmax=1;
     caxis([-1 1]*vmax/2)
     title(['T = ',num2str(t),' sec'])
 

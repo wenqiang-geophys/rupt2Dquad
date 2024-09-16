@@ -219,14 +219,16 @@ subroutine get_flux(mesh,u,du,uax,uay,i,is,ie,qi,fstar)
         ! velocity penalties
         fp(3:5) = fc(3:5) + 0.1*fp(3:5)
 
-        fp = fc + 0.2 * 0.5 * cp * (uR-uL) !! LLF
+        fp = fc + 0.1 * 0.5 * cp * (uR-uL) !! LLF
 
         fp = fp * norm_vec_n
 
         fstar = fp
         fstar(6:8) = 0.0
 
+        if (use_pml==1) then
         call get_flux_pml(mesh,u,uax,uay,i,is,ie,qi,fstar)
+        endif
 
         return
     end if

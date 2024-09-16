@@ -57,6 +57,9 @@ integer,parameter :: ELEM_FLUID = 1
 !integer :: Order, NGLL, nsurface
 !integer :: Np
 
+! pml
+integer :: use_pml
+
 ! Low storage Runge-Kutta coefficients
 real(kind=rkind),parameter :: rk4a(5) = (/ &
         0.0,                               &
