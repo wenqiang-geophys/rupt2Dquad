@@ -3,6 +3,7 @@ module mod_io_fault
   use mod_para
   use mod_types
   use netcdf
+  use mod_check
 
   implicit none
 
@@ -21,17 +22,6 @@ subroutine check(status)
   end if
 end subroutine
 
-subroutine check2(status,msg)
-  implicit none
-  integer, intent ( in) :: status
-  character(len=*) :: msg
-
-  if(status /= nf90_noerr) then
-    print *, trim(nf90_strerror(status))
-    print *, trim(msg)
-    stop 110
-  end if
-end subroutine
 
 subroutine fault_io_init(mesh)
   implicit none

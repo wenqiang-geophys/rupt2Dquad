@@ -92,14 +92,7 @@ mesh%rank = myrank
 !call lagint(x1,x2,G,D)
 
 
-!write(filename,'(a,i6.6)') 'mesh/meshVar',myrank
-!call readMeshVar(mesh,'mesh/meshVar000000')
-if (nproc == 1) then
-    !call read_mesh(mesh,'mesh1')
-    call readMeshVar(mesh,myrank)
-else
-    call readMeshVar(mesh,myrank)
-end if
+call readMeshVar(mesh,myrank,nproc)
 call build_geometry(mesh)
 
 mesh_dir = 'data'

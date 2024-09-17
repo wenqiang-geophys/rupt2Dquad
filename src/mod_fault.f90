@@ -4,6 +4,7 @@ use mod_para
 use mod_mesh
 use mod_wave
 use mod_types
+use mod_init_fault
 
 implicit none
 
@@ -363,6 +364,8 @@ subroutine fault_init(mesh)
 
         enddo
     enddo
+
+    call fault_init_external(mesh)
 
     mesh%stress = mesh%tau_0
 

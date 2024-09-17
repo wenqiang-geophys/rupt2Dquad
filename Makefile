@@ -13,7 +13,7 @@ BLAS := /opt/homebrew/opt/openblas
 NETCDF := /opt/homebrew/opt/netcdf
 NETCDFF := /opt/homebrew/opt/netcdf-fortran
 
-FC := mpif90 -O3 -cpp -DpOrder=2 -DPSV -DSTRAIN -DTPV5 # -DVERSION1  # -DSYM # -DFD
+FC := mpif90 -O3 -cpp -DpOrder=4 -DPSV -DSTRAIN -DTPV5 # -DVERSION1  # -DSYM # -DFD
 #FC := gfortran -Wall -O3 -cpp -DSTRESS -DPSV
 
 #-fopenmp
@@ -32,12 +32,14 @@ SRC := mod_para.f90 \
        mod_gll.f90 \
        mod_fd.f90 \
        mod_types.f90 \
+       mod_check.f90 \
        mod_mesh.f90 \
        mod_geometry.f90 \
        mod_funcs.f90 \
        mod_numflux_pml.f90 \
        mod_numflux_v2.f90 \
        mod_wave.f90 \
+       mod_init_fault.f90 \
        mod_fault.f90 \
        mod_mpi.f90 \
        mod_exchange.f90 \

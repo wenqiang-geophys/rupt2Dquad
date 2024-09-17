@@ -457,7 +457,7 @@ for iproc = 1:nproc
     end
 end
 
-
+if 0
 for iproc = 1:nproc
     fnm = sprintf('data/meshVar%06d',iproc-1);
     fid = fopen(fnm, 'w');
@@ -511,6 +511,7 @@ for iproc = 1:nproc
     end
     fclose(fid);
 end
+end
 
 for iproc = 1:nproc
     fnm = sprintf('data/meshVar%06d.nc',iproc-1);
@@ -524,6 +525,10 @@ for iproc = 1:nproc
     dimid4 = netcdf.defDim(ncid,'four',4);
     dimid_face = netcdf.defDim(ncid,'Nfaces',4);
     dimid_vertex = netcdf.defDim(ncid,'Nvertex',4);
+    dimid_mpi_nn = netcdf.defDim(ncid,'mpi_nn',db(iproc).mpi_nn);
+    dimid_mpi_ne = netcdf.defDim(ncid,'mpi_ne',db(iproc).mpi_ne);
+    dimid_mpi_mx = netcdf.defDim(ncid,'mpi_nemax',db(iproc).mpi_nemax);
+    dimid_mpi_pf = netcdf.defDim(ncid,'pinterfaces',db(iproc).pinterfaces);
 
     varid1 = netcdf.defVar(ncid,'node','NC_DOUBLE',[dimid2,dimid_node]);
     varid2 = netcdf.defVar(ncid,'elem','NC_INT',[dimid_vertex,dimid_elem]);
@@ -548,6 +553,14 @@ for iproc = 1:nproc
     varid20 = netcdf.defVar(ncid,'b'    ,'NC_DOUBLE',[dimid2,dimid_face,dimid_fault_elem]);
     varid21 = netcdf.defVar(ncid,'Vw'   ,'NC_DOUBLE',[dimid2,dimid_face,dimid_fault_elem]);
     varid22 = netcdf.defVar(ncid,'state','NC_DOUBLE',[dimid2,dimid_face,dimid_fault_elem]);
+    % mpi
+    varid23 = netcdf.defVar(ncid,'mpi_rho','NC_DOUBLE',[dimid_mpi_pf,dimid3]);
+    varid24 = netcdf.defVar(ncid,'mpi_vp' ,'NC_DOUBLE',[dimid_mpi_pf,dimid3]);
+    varid25 = netcdf.defVar(ncid,'mpi_vs' ,'NC_DOUBLE',[dimid_mpi_pf,dimid3]);
+    varid26 = netcdf.defVar(ncid,'mpi_neighbor','NC_DOUBLE',[dimid_mpi_nn]);
+    varid27 = netcdf.defVar(ncid,'mpi_connection','NC_DOUBLE',[dimid_mpi_nn,dimid_mpi_ne,dimid2]);
+    varid28 = netcdf.defVar(ncid,'mpi_ibool','NC_DOUBLE',[dimid4,dimid_mpi_mx]);
+    varid29 = netcdf.defVar(ncid,'mpi_interface','NC_DOUBLE',[dimid4,dimid4,dimid_elem]);
     netcdf.endDef(ncid);
 
     netcdf.putVar(ncid,varid1,db(iproc).node);
@@ -561,6 +574,15 @@ for iproc = 1:nproc
     netcdf.putVar(ncid,varid9,db(iproc).rho);
     netcdf.putVar(ncid,varid10,db(iproc).vp);
     netcdf.putVar(ncid,varid11,db(iproc).vs);
+    % mpi
+    netcdf.putVar(ncid,varid23,db(iproc).mpi_rho);
+    netcdf.putVar(ncid,varid24,db(iproc).mpi_vp);
+    netcdf.putVar(ncid,varid25,db(iproc).mpi_vs);
+    netcdf.putVar(ncid,varid26,db(iproc).mpi_neighbor);
+    netcdf.putVar(ncid,varid27,db(iproc).mpi_connection);
+    netcdf.putVar(ncid,varid28,db(iproc).mpi_ibool);
+    netcdf.putVar(ncid,varid29,db(iproc).mpi_interface);
+
     netcdf.close(ncid);
 
 

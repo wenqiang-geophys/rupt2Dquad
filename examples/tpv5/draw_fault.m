@@ -60,7 +60,7 @@ if strcmp(varnm, 'rate')
     title(c,'m/s')
     caxis([0 3])
 end
-colormap jet
+%colormap jet
 xlabel('X (km)')
 ylabel('T (sec)')
 set(gca,'FontSize',12)

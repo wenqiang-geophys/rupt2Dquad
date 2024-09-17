@@ -23,17 +23,27 @@ for iproc = 0:nproc-1
 
     Nelem = size(elem,2);
     Nnode = size(node,2);
-    Nelem_fault = size(Sxx,3);
+    if (isempty(Sxx))
+        Nelem_fault = 0;
+    else
+        Nelem_fault = size(Sxx,3);
+    end
     fprintf('iproc=%d,Nelem=%d,Nnode=%d,Nelem_fault=%d\n', ...
         iproc,Nelem,Nnode,Nelem_fault);
 
-    ief = 0;
+    ief = 1;
     X = Sxx * 0;
+    isfault=0;
     %for ief = 1:Nelem_fault
     for ie = 1:Nelem
+        if(isfault==1)
+            ief=ief+1;
+        end
+        isfault = 0;
         for is = 1:Nfaces
             if (bctype(is,ie)>=BC_FAULT)
-                ief = ief + 1;
+                %ief = ief + 1;
+                isfault = 1;
                 xc = mean(node(1,elem(FtoV(is,:),ie)));
                 yc = mean(node(2,elem(FtoV(is,:),ie)));
 
@@ -45,17 +55,9 @@ for iproc = 0:nproc-1
                     sxx = 0e6;
                     syy = -120e6;
                     sxy = 70e6;
-                    if (abs(x)<1.5e3)
+                    if (abs(x+8e3)<1.5e3)
                         sxy = 81.6e6;
                     end
-
-                    if (abs(x-7.5e3)<1.5e3)
-                        sxy = 60e6;
-                    end
-                    if (abs(x+7.5e3)<1.5e3)
-                        sxy = 80e6;
-                    end
-
 
                     X(i,is,ief) = x;
 
@@ -84,6 +86,7 @@ for iproc = 0:nproc-1
     var6 = netcdf.inqVarID(ncid,'Dc');
     var7 = netcdf.inqVarID(ncid,'C0');
 
+    if Nelem_fault > 0
     netcdf.putVar(ncid,var1,Sxx);
     netcdf.putVar(ncid,var2,Syy);
     netcdf.putVar(ncid,var3,Sxy);
@@ -91,6 +94,7 @@ for iproc = 0:nproc-1
     netcdf.putVar(ncid,var5,mu_d);
     netcdf.putVar(ncid,var6,Dc);
     netcdf.putVar(ncid,var7,C0);
+    end
 
     netcdf.close(ncid);
 

@@ -675,6 +675,23 @@ end subroutine
 !old         !end do
 !old     end if
 !old end subroutine
+function interp1d(v1,v2,c1,c2,p) result (cp)
+    implicit none
 
+    real(kind=rkind),dimension(2) :: v1,v2
+    real(kind=rkind) :: c1,c2,cp
+    real(kind=rkind),dimension(2) :: p
+    real(kind=rkind) :: r1,r2,r
+
+    ! attention! we assume that v1,v2 and p are colinear!!!
+
+    r1=dsqrt((p(1)-v1(1))**2+(p(2)-v1(2))**2)
+    r2=dsqrt((p(1)-v2(1))**2+(p(2)-v2(2))**2)
+
+    r = r1/(r1+r2)
+
+    ! v1: r=0; v2: r=1
+    cp=c1+r*(c2-c1)
+end function
 
 end module
