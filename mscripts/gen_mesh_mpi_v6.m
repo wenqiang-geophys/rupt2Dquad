@@ -455,62 +455,82 @@ for iproc = 1:nproc
             db(iproc).Nelem_fault = db(iproc).Nelem_fault+1;
         end
     end
+
+    % fault2wave, wave2fault
+
+    disp(['iproc=',num2str(iproc),';Nelem_fault=',num2str(db(iproc).Nelem_fault)]);
+    db(iproc).fault2wave = zeros(db(iproc).Nelem_fault,1);
+    db(iproc).wave2fault = zeros(db(iproc).Nelem,1);
+    k = 0;
+    for ie = 1:db(iproc).Nelem
+        isfault=0;
+        for is = 1:Nfaces
+            if (db(iproc).bctype(is,ie) >= BC_FAULT)
+                isfault=1;
+            end
+        end
+        if (isfault)
+            k = k + 1;
+            db(iproc).fault2wave(k) = ie;
+            db(iproc).wave2fault(ie) = k;
+        end
+    end
 end
 
 if 0
-for iproc = 1:nproc
-    fnm = sprintf('data/meshVar%06d',iproc-1);
-    fid = fopen(fnm, 'w');
+    for iproc = 1:nproc
+        fnm = sprintf('data/meshVar%06d',iproc-1);
+        fid = fopen(fnm, 'w');
 
-    fprintf(fid, '%d\n',db(iproc).Nnode);
-    fprintf(fid, '%g ',db(iproc).node); fprintf(fid,'\n');
-    fprintf(fid, '%d\n',db(iproc).Nelem);
-    fprintf(fid, '%d ',db(iproc).elem); fprintf(fid, '\n');
-    fprintf(fid, '%d ',db(iproc).neighbor); fprintf(fid, '\n');
-    fprintf(fid, '%d ',db(iproc).face); fprintf(fid, '\n');
-    fprintf(fid, '%d ',db(iproc).direction); fprintf(fid, '\n');
-    fprintf(fid, '%d ',db(iproc).bctype); fprintf(fid, '\n');
-    fprintf(fid, '%d ',db(iproc).fluxtype); fprintf(fid, '\n');
-    fprintf(fid, '%d ',db(iproc).elemtype); fprintf(fid, '\n');
-    fprintf(fid, '%d ',db(iproc).rho); fprintf(fid, '\n');
-    fprintf(fid, '%d ',db(iproc).vp); fprintf(fid, '\n');
-    fprintf(fid, '%d ',db(iproc).vs); fprintf(fid, '\n');
+        fprintf(fid, '%d\n',db(iproc).Nnode);
+        fprintf(fid, '%g ',db(iproc).node); fprintf(fid,'\n');
+        fprintf(fid, '%d\n',db(iproc).Nelem);
+        fprintf(fid, '%d ',db(iproc).elem); fprintf(fid, '\n');
+        fprintf(fid, '%d ',db(iproc).neighbor); fprintf(fid, '\n');
+        fprintf(fid, '%d ',db(iproc).face); fprintf(fid, '\n');
+        fprintf(fid, '%d ',db(iproc).direction); fprintf(fid, '\n');
+        fprintf(fid, '%d ',db(iproc).bctype); fprintf(fid, '\n');
+        fprintf(fid, '%d ',db(iproc).fluxtype); fprintf(fid, '\n');
+        fprintf(fid, '%d ',db(iproc).elemtype); fprintf(fid, '\n');
+        fprintf(fid, '%d ',db(iproc).rho); fprintf(fid, '\n');
+        fprintf(fid, '%d ',db(iproc).vp); fprintf(fid, '\n');
+        fprintf(fid, '%d ',db(iproc).vs); fprintf(fid, '\n');
 
-    fprintf(fid, '%d\n',db(iproc).mpi_nn);
-    fprintf(fid, '%d\n',db(iproc).mpi_ne);
-    fprintf(fid, '%d\n',db(iproc).mpi_nemax);
-    fprintf(fid, '%d\n',db(iproc).pinterfaces);
-    fprintf(fid, '%d ',db(iproc).mpi_neighbor); fprintf(fid, '\n');
-    fprintf(fid, '%d ',db(iproc).mpi_connection); fprintf(fid, '\n');
-    %fprintf(fid, '%d ',db(iproc).loc2glob_nodes); fprintf(fid, '\n');
-    fprintf(fid, '%d ',db(iproc).mpi_ibool); fprintf(fid, '\n');
-    fprintf(fid, '%d ',db(iproc).mpi_interface); fprintf(fid, '\n');
-    if (nproc > 1)
-        fprintf(fid, '%d ',db(iproc).mpi_rho); fprintf(fid, '\n');
-        fprintf(fid, '%d ',db(iproc).mpi_vp); fprintf(fid, '\n');
-        fprintf(fid, '%d ',db(iproc).mpi_vs); fprintf(fid, '\n');
+        fprintf(fid, '%d\n',db(iproc).mpi_nn);
+        fprintf(fid, '%d\n',db(iproc).mpi_ne);
+        fprintf(fid, '%d\n',db(iproc).mpi_nemax);
+        fprintf(fid, '%d\n',db(iproc).pinterfaces);
+        fprintf(fid, '%d ',db(iproc).mpi_neighbor); fprintf(fid, '\n');
+        fprintf(fid, '%d ',db(iproc).mpi_connection); fprintf(fid, '\n');
+        %fprintf(fid, '%d ',db(iproc).loc2glob_nodes); fprintf(fid, '\n');
+        fprintf(fid, '%d ',db(iproc).mpi_ibool); fprintf(fid, '\n');
+        fprintf(fid, '%d ',db(iproc).mpi_interface); fprintf(fid, '\n');
+        if (nproc > 1)
+            fprintf(fid, '%d ',db(iproc).mpi_rho); fprintf(fid, '\n');
+            fprintf(fid, '%d ',db(iproc).mpi_vp); fprintf(fid, '\n');
+            fprintf(fid, '%d ',db(iproc).mpi_vs); fprintf(fid, '\n');
+        end
+
+        fprintf(fid, '%d ',db(iproc).recv_number); fprintf(fid, '\n');
+        if (db(iproc).recv_number > 0)
+            fprintf(fid, '%d ',db(iproc).recv_fid); fprintf(fid, '\n');
+            fprintf(fid, '%d ',db(iproc).recv_i); fprintf(fid, '\n');
+            %fprintf(fid, '%d ',db(iproc).recv_j); fprintf(fid, '\n');
+            fprintf(fid, '%d ',db(iproc).recv_ie); fprintf(fid, '\n');
+            fprintf(fid, '%d ',db(iproc).recv_refx); fprintf(fid, '\n');
+        end
+
+        fprintf(fid, '%d ',db(iproc).body_recv_number); fprintf(fid, '\n');
+        if (db(iproc).body_recv_number > 0)
+            fprintf(fid, '%d ',db(iproc).body_recv_fid); fprintf(fid, '\n');
+            fprintf(fid, '%d ',db(iproc).body_recv_i); fprintf(fid, '\n');
+            fprintf(fid, '%d ',db(iproc).body_recv_j); fprintf(fid, '\n');
+            fprintf(fid, '%d ',db(iproc).body_recv_ie); fprintf(fid, '\n');
+            fprintf(fid, '%g ',db(iproc).body_recv_refx); fprintf(fid, '\n');
+            fprintf(fid, '%g ',db(iproc).body_recv_refy); fprintf(fid, '\n');
+        end
+        fclose(fid);
     end
-
-    fprintf(fid, '%d ',db(iproc).recv_number); fprintf(fid, '\n');
-    if (db(iproc).recv_number > 0)
-        fprintf(fid, '%d ',db(iproc).recv_fid); fprintf(fid, '\n');
-        fprintf(fid, '%d ',db(iproc).recv_i); fprintf(fid, '\n');
-        %fprintf(fid, '%d ',db(iproc).recv_j); fprintf(fid, '\n');
-        fprintf(fid, '%d ',db(iproc).recv_ie); fprintf(fid, '\n');
-        fprintf(fid, '%d ',db(iproc).recv_refx); fprintf(fid, '\n');
-    end
-
-    fprintf(fid, '%d ',db(iproc).body_recv_number); fprintf(fid, '\n');
-    if (db(iproc).body_recv_number > 0)
-        fprintf(fid, '%d ',db(iproc).body_recv_fid); fprintf(fid, '\n');
-        fprintf(fid, '%d ',db(iproc).body_recv_i); fprintf(fid, '\n');
-        fprintf(fid, '%d ',db(iproc).body_recv_j); fprintf(fid, '\n');
-        fprintf(fid, '%d ',db(iproc).body_recv_ie); fprintf(fid, '\n');
-        fprintf(fid, '%g ',db(iproc).body_recv_refx); fprintf(fid, '\n');
-        fprintf(fid, '%g ',db(iproc).body_recv_refy); fprintf(fid, '\n');
-    end
-    fclose(fid);
-end
 end
 
 for iproc = 1:nproc
@@ -541,18 +561,22 @@ for iproc = 1:nproc
     varid9 = netcdf.defVar(ncid,'rho','NC_DOUBLE',[dimid_elem]);
     varid10 = netcdf.defVar(ncid,'vp','NC_DOUBLE',[dimid_elem]);
     varid11 = netcdf.defVar(ncid,'vs','NC_DOUBLE',[dimid_elem]);
+    varid32 = netcdf.defVar(ncid,'fault2wave','NC_INT',[dimid_fault_elem]);
+    varid33 = netcdf.defVar(ncid,'wave2fault','NC_INT',[dimid_elem]);
     % fault congfiguration
-    varid12 = netcdf.defVar(ncid,'Sxx0' ,'NC_DOUBLE',[dimid2,dimid_face,dimid_fault_elem]);
-    varid13 = netcdf.defVar(ncid,'Syy0' ,'NC_DOUBLE',[dimid2,dimid_face,dimid_fault_elem]);
-    varid14 = netcdf.defVar(ncid,'Sxy0' ,'NC_DOUBLE',[dimid2,dimid_face,dimid_fault_elem]);
-    varid15 = netcdf.defVar(ncid,'mu_s' ,'NC_DOUBLE',[dimid2,dimid_face,dimid_fault_elem]);
-    varid16 = netcdf.defVar(ncid,'mu_d' ,'NC_DOUBLE',[dimid2,dimid_face,dimid_fault_elem]);
-    varid17 = netcdf.defVar(ncid,'Dc'   ,'NC_DOUBLE',[dimid2,dimid_face,dimid_fault_elem]);
-    varid18 = netcdf.defVar(ncid,'C0'   ,'NC_DOUBLE',[dimid2,dimid_face,dimid_fault_elem]);
-    varid19 = netcdf.defVar(ncid,'a'    ,'NC_DOUBLE',[dimid2,dimid_face,dimid_fault_elem]);
-    varid20 = netcdf.defVar(ncid,'b'    ,'NC_DOUBLE',[dimid2,dimid_face,dimid_fault_elem]);
-    varid21 = netcdf.defVar(ncid,'Vw'   ,'NC_DOUBLE',[dimid2,dimid_face,dimid_fault_elem]);
-    varid22 = netcdf.defVar(ncid,'state','NC_DOUBLE',[dimid2,dimid_face,dimid_fault_elem]);
+    varid12 = netcdf.defVar(ncid,'Sxx0'  ,'NC_DOUBLE',[dimid2,dimid_face,dimid_fault_elem]);
+    varid13 = netcdf.defVar(ncid,'Syy0'  ,'NC_DOUBLE',[dimid2,dimid_face,dimid_fault_elem]);
+    varid14 = netcdf.defVar(ncid,'Sxy0'  ,'NC_DOUBLE',[dimid2,dimid_face,dimid_fault_elem]);
+    varid30 = netcdf.defVar(ncid,'sigma0','NC_DOUBLE',[dimid2,dimid_face,dimid_fault_elem]);
+    varid31 = netcdf.defVar(ncid,'tau0'  ,'NC_DOUBLE',[dimid2,dimid_face,dimid_fault_elem]);
+    varid15 = netcdf.defVar(ncid,'mu_s'  ,'NC_DOUBLE',[dimid2,dimid_face,dimid_fault_elem]);
+    varid16 = netcdf.defVar(ncid,'mu_d'  ,'NC_DOUBLE',[dimid2,dimid_face,dimid_fault_elem]);
+    varid17 = netcdf.defVar(ncid,'Dc'    ,'NC_DOUBLE',[dimid2,dimid_face,dimid_fault_elem]);
+    varid18 = netcdf.defVar(ncid,'C0'    ,'NC_DOUBLE',[dimid2,dimid_face,dimid_fault_elem]);
+    varid19 = netcdf.defVar(ncid,'a'     ,'NC_DOUBLE',[dimid2,dimid_face,dimid_fault_elem]);
+    varid20 = netcdf.defVar(ncid,'b'     ,'NC_DOUBLE',[dimid2,dimid_face,dimid_fault_elem]);
+    varid21 = netcdf.defVar(ncid,'Vw'    ,'NC_DOUBLE',[dimid2,dimid_face,dimid_fault_elem]);
+    varid22 = netcdf.defVar(ncid,'state' ,'NC_DOUBLE',[dimid2,dimid_face,dimid_fault_elem]);
     % mpi
     varid23 = netcdf.defVar(ncid,'mpi_rho','NC_DOUBLE',[dimid_mpi_pf,dimid3]);
     varid24 = netcdf.defVar(ncid,'mpi_vp' ,'NC_DOUBLE',[dimid_mpi_pf,dimid3]);
@@ -574,6 +598,10 @@ for iproc = 1:nproc
     netcdf.putVar(ncid,varid9,db(iproc).rho);
     netcdf.putVar(ncid,varid10,db(iproc).vp);
     netcdf.putVar(ncid,varid11,db(iproc).vs);
+    if (db(iproc).Nelem_fault > 0)
+        netcdf.putVar(ncid,varid32,db(iproc).fault2wave);
+    end
+    netcdf.putVar(ncid,varid33,db(iproc).wave2fault);
     % mpi
     netcdf.putVar(ncid,varid23,db(iproc).mpi_rho);
     netcdf.putVar(ncid,varid24,db(iproc).mpi_vp);

@@ -20,6 +20,7 @@ for iproc = 0:nproc-1
     Dc   = ncread(fnm_out,'Dc'  );
     C0   = ncread(fnm_out,'C0'  );
     bctype = ncread(fnm_out,'bctype');
+    fault2wave = ncread(fnm_out,'fault2wave');
 
     Nelem = size(elem,2);
     Nnode = size(node,2);
@@ -29,11 +30,12 @@ for iproc = 0:nproc-1
 
     ief = 0;
     X = Sxx * 0;
-    %for ief = 1:Nelem_fault
-    for ie = 1:Nelem
+    for ief = 1:Nelem_fault
+    %for ie = 1:Nelem
+        ie = fault2wave(ief);
         for is = 1:Nfaces
             if (bctype(is,ie)>=BC_FAULT)
-                ief = ief + 1;
+                %ief = ief + 1;
                 xc = mean(node(1,elem(FtoV(is,:),ie)));
                 yc = mean(node(2,elem(FtoV(is,:),ie)));
 

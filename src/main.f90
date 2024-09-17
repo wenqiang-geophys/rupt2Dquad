@@ -24,6 +24,7 @@ use mod_io_free
 use mod_io_inter_s
 use mod_io_inter_f
 use mod_io_wave
+use mod_read
 
 implicit none
 
@@ -57,8 +58,8 @@ real(kind=rkind) :: CFL,damp_s
 integer :: src_idx,src_ie,src_i,src_j
 real(kind=rkind) :: src_dist
 
-integer :: fault_snap_skip
-integer :: wave_snap_skip
+!integer :: fault_snap_skip
+!integer :: wave_snap_skip
 
 use_pml = 0
 fault_snap_skip = 1
@@ -91,6 +92,7 @@ mesh%rank = myrank
 !call gll_nodes(p2,x2,wts2)
 !call lagint(x1,x2,G,D)
 
+call read_parameters()
 
 call readMeshVar(mesh,myrank,nproc)
 call build_geometry(mesh)
@@ -164,7 +166,7 @@ call init_buff(mesh,buff)
 !allocate(q_rec(Nfp*mesh%mpi_ne*dimens,mesh%mpi_nn))
 !allocate(qi(Nfp,dimens,mesh%mpi_ne,mesh%mpi_nn))
 
-tmax = 10
+tmax = simu_time_max
 !tmax = 50
 !dt = 3.0*mesh%dtfactor
 minGLL = mesh%xnode(2)-mesh%xnode(1)
@@ -236,6 +238,7 @@ if (myrank==0) print*,'nt = ',nt
 !print*,'dt = ',dt
 tskip = int(0.5/dt)
 !tskip = 2
+tskip = fault_snap_skip
 if(myrank==0) print*,'tskip = ',tskip
 
 wave_snap_skip = tskip
@@ -597,7 +600,7 @@ do it = 1,nt
         call fault_io_save(mesh,(it-1)/fault_snap_skip+1)
     end if
     if (mod(it-1,wave_snap_skip) == 0) then
-        if(myrank==0) print*,'writing data/wave_mpi @ it = ',it
+        if(myrank==0) print*,'writing data/wave_mpi @ ',it,'/',nt
         call wave_io_save(mesh,wave%u,(it-1)/wave_snap_skip+1)
     end if
 enddo ! it

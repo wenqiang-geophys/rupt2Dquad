@@ -19,8 +19,8 @@ subroutine fault_init_external(mesh)
   integer :: ncid,varid,ierr
   character(len=128) :: filename
   real(kind=rkind) :: vec_n(2),vec_m(2)
-  real(kind=rkind) :: Tx,Ty,Tn,Tm,Sxx,Syy,Sxy
-  real(kind=rkind),allocatable,dimension(:,:,:) :: Sxx0,Syy0,Sxy0
+  real(kind=rkind) :: Tx,Ty,Tn,Tm,Sxx,Syy,Sxy,sigma,tau
+  real(kind=rkind),allocatable,dimension(:,:,:) :: Sxx0,Syy0,Sxy0,sigma0,tau0
   real(kind=rkind),allocatable,dimension(:,:,:) :: mu_s,mu_d,Dc,C0
   real(kind=rkind) :: c(2),cp,p(2),v1(2),v2(2)
 
@@ -40,6 +40,8 @@ subroutine fault_init_external(mesh)
   allocate(Sxx0(2,Nfaces,mesh%nelem_fault))
   allocate(Syy0(2,Nfaces,mesh%nelem_fault))
   allocate(Sxy0(2,Nfaces,mesh%nelem_fault))
+  allocate(sigma0(2,Nfaces,mesh%nelem_fault))
+  allocate(tau0(2,Nfaces,mesh%nelem_fault))
   allocate(mu_s(2,Nfaces,mesh%nelem_fault))
   allocate(mu_d(2,Nfaces,mesh%nelem_fault))
   allocate(Dc  (2,Nfaces,mesh%nelem_fault))
@@ -62,6 +64,16 @@ subroutine fault_init_external(mesh)
   call check2(ierr,'inq_varid Sxy0')
   ierr = nf90_get_var(ncid,varid,Sxy0)
   call check2(ierr,'get_var Sxy0')
+
+  ierr = nf90_inq_varid(ncid,'sigma0',varid)
+  call check2(ierr,'inq_varid sigma0')
+  ierr = nf90_get_var(ncid,varid,sigma0)
+  call check2(ierr,'get_var sigma0')
+
+  ierr = nf90_inq_varid(ncid,'tau0',varid)
+  call check2(ierr,'inq_varid tau0')
+  ierr = nf90_get_var(ncid,varid,tau0)
+  call check2(ierr,'get_var tau0')
 
   ierr = nf90_inq_varid(ncid,'mu_s',varid)
   call check2(ierr,'inq_varid mu_s')
@@ -125,18 +137,27 @@ subroutine fault_init_external(mesh)
           cp=interp1d(v1,v2,c(1),c(2),p)
           mesh%C0(i,is,ief)=cp
 
-          c=Sxx0(1:2,is,ief)
-          Sxx=interp1d(v1,v2,c(1),c(2),p)
+          if (input_stress_type==0) then
+            c=Sxx0(1:2,is,ief)
+            Sxx=interp1d(v1,v2,c(1),c(2),p)
 
-          c=Syy0(1:2,is,ief)
-          Syy=interp1d(v1,v2,c(1),c(2),p)
+            c=Syy0(1:2,is,ief)
+            Syy=interp1d(v1,v2,c(1),c(2),p)
 
-          c=Sxy0(1:2,is,ief)
-          Sxy=interp1d(v1,v2,c(1),c(2),p)
+            c=Sxy0(1:2,is,ief)
+            Sxy=interp1d(v1,v2,c(1),c(2),p)
+          elseif (input_stress_type==1) then
+            c=sigma0(1:2,is,ief)
+            sigma=interp1d(v1,v2,c(1),c(2),p)
+
+            c=tau0(1:2,is,ief)
+            tau=interp1d(v1,v2,c(1),c(2),p)
+          endif
 
           vec_n = (/mesh%nx(i,is,ie),mesh%ny(i,is,ie)/)
           vec_m = (/-vec_n(2),vec_n(1)/)
 
+          if (input_stress_type==0) then
           Tx = sxx*vec_n(1)+sxy*vec_n(2)
           Ty = sxy*vec_n(1)+syy*vec_n(2)
 
@@ -144,6 +165,10 @@ subroutine fault_init_external(mesh)
 
           mesh%tau_n(i,is,ief) = Tn
           mesh%tau_0(i,is,ief) = Tm
+          elseif (input_stress_type==1) then
+          mesh%tau_n(i,is,ief) = sigma
+          mesh%tau_0(i,is,ief) = tau
+          endif
 
           ! write initial stress
           !mesh%stress1(i,is,ief) = Tm+0*dTm

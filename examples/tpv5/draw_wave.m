@@ -47,6 +47,9 @@ for it =   1:1:1000
     vmax = max(abs(v1(:)));
     disp(['it = ',num2str(it),' vmax = ',num2str(vmax)]);
     plotSolutionFast(tri,x*1e-3,y*1e-3,v1  )
+    hold on
+    plot([-15 15],[0 0],'k','LineWidth',1.5)
+    hold off
   
 
     colormap rdbu
@@ -60,7 +63,7 @@ for it =   1:1:1000
     caxis([-1 1]*vmax/2)
     title(['T = ',num2str(t),' sec'])
 
-    
+    axis([-2 2 -1 1]*10)
     
     %ylim([-1 0]*50)
     %xlim([-1 1]*80)

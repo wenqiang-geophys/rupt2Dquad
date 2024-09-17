@@ -61,6 +61,12 @@ for it =   1:1:1000
     %ylim([-1 0]*50)
     %xlim([-1 1]*80)
 
+    axis([-2 2 -1 1]*10)
+    hold on
+    plot3([-16 12],[0 0],[1 1]*1e30,'k','LineWidth',1.5)
+    plot3([0 12*cosd(30)],[0 -12*sind(30)],[1 1]*1e30,'k','LineWidth',1.5)
+    
+    hold off
 
     pause(0.005)
 

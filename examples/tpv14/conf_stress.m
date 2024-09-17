@@ -12,38 +12,42 @@ for iproc = 0:nproc-1
 
     node = ncread(fnm_out,'node');
     elem = ncread(fnm_out,'elem');
-    Sxx  = ncread(fnm_out,'Sxx0');
-    Syy  = ncread(fnm_out,'Syy0');
-    Sxy  = ncread(fnm_out,'Sxy0');
+    sigma0 = ncread(fnm_out,'sigma0');
+    tau0 = ncread(fnm_out,'tau0');
     mu_s = ncread(fnm_out,'mu_s');
     mu_d = ncread(fnm_out,'mu_d');
     Dc   = ncread(fnm_out,'Dc'  );
     C0   = ncread(fnm_out,'C0'  );
     bctype = ncread(fnm_out,'bctype');
+    fault2wave = ncread(fnm_out,'fault2wave');
 
     Nelem = size(elem,2);
     Nnode = size(node,2);
-    if (isempty(Sxx))
+    if (isempty(fault2wave))
         Nelem_fault = 0;
     else
-        Nelem_fault = size(Sxx,3);
+        Nelem_fault = length(fault2wave);
     end
     fprintf('iproc=%d,Nelem=%d,Nnode=%d,Nelem_fault=%d\n', ...
         iproc,Nelem,Nnode,Nelem_fault);
 
     ief = 1;
-    X = Sxx * 0;
     isfault=0;
-    %for ief = 1:Nelem_fault
-    for ie = 1:Nelem
-        if(isfault==1)
-            ief=ief+1;
-        end
-        isfault = 0;
+    for ief = 1:Nelem_fault
+        ie = fault2wave(ief);
+        % calculate normal vectors
         for is = 1:Nfaces
+            j1=is;j2=is+1;
+            if (j1==Nfaces)
+                j2=1;
+            end
+            va = node(:,elem(j1,ie));
+            vb = node(:,elem(j2,ie));
+            vec_m = vb-va;
+            vec_m = vec_m/norm(vec_m);
+            vec_n = [vec_m(2),-vec_m(1)];
+
             if (bctype(is,ie)>=BC_FAULT)
-                %ief = ief + 1;
-                isfault = 1;
                 xc = mean(node(1,elem(FtoV(is,:),ie)));
                 yc = mean(node(2,elem(FtoV(is,:),ie)));
 
@@ -52,18 +56,20 @@ for iproc = 0:nproc-1
                     x = node(1,elem(j,ie));
                     y = node(2,elem(j,ie));
 
-                    sxx = 0e6;
-                    syy = -120e6;
-                    sxy = 70e6;
+                    sigma = -120e6;
+                    tau = 70e6;
                     if (abs(x+8e3)<1.5e3)
-                        sxy = 81.6e6;
+                        tau = 81.6e6;
                     end
 
-                    X(i,is,ief) = x;
+                    %if (vec_n(2)<0)
+                        %tau = -tau;
+                        %sigma = -sigma;
+                    %end
+                    tau = -tau;
 
-                    Sxx(i,is,ief) = sxx;
-                    Syy(i,is,ief) = syy;
-                    Sxy(i,is,ief) = sxy;
+                    sigma0(i,is,ief) = sigma;
+                    tau0(i,is,ief) = tau;
 
                     mu_s(i,is,ief) = 0.677;
                     mu_d(i,is,ief) = 0.525;
@@ -78,18 +84,16 @@ for iproc = 0:nproc-1
 
     ncid = netcdf.open(fnm_out,'WRITE');
 
-    var1 = netcdf.inqVarID(ncid,'Sxx0');
-    var2 = netcdf.inqVarID(ncid,'Syy0');
-    var3 = netcdf.inqVarID(ncid,'Sxy0');
+    var1 = netcdf.inqVarID(ncid,'sigma0');
+    var2 = netcdf.inqVarID(ncid,'tau0');
     var4 = netcdf.inqVarID(ncid,'mu_s');
     var5 = netcdf.inqVarID(ncid,'mu_d');
     var6 = netcdf.inqVarID(ncid,'Dc');
     var7 = netcdf.inqVarID(ncid,'C0');
 
     if Nelem_fault > 0
-    netcdf.putVar(ncid,var1,Sxx);
-    netcdf.putVar(ncid,var2,Syy);
-    netcdf.putVar(ncid,var3,Sxy);
+    netcdf.putVar(ncid,var1,sigma0);
+    netcdf.putVar(ncid,var2,tau0);
     netcdf.putVar(ncid,var4,mu_s);
     netcdf.putVar(ncid,var5,mu_d);
     netcdf.putVar(ncid,var6,Dc);

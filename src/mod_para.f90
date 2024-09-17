@@ -2,6 +2,11 @@ module mod_para
 
 implicit none
 
+#ifndef pOrder
+#define pOrder 2
+#endif
+
+character(len=256) :: problem
 character(len=256) :: mesh_dir
 character(len=256) :: data_dir
 
@@ -57,9 +62,6 @@ integer,parameter :: ELEM_FLUID = 1
 !integer :: Order, NGLL, nsurface
 !integer :: Np
 
-! pml
-integer :: use_pml
-
 ! Low storage Runge-Kutta coefficients
 real(kind=rkind),parameter :: rk4a(5) = (/ &
         0.0,                               &
@@ -79,6 +81,89 @@ real(kind=rkind),parameter :: rk4c(5) = (/ &
         2526269341429.0/6820363962896.0,   &
         2006345519317.0/3224310063776.0,   &
         2802321613138.0/2924317926251.0/)
+
+! mpi
+logical :: masternode
+
+logical :: nice_print
+
+real(kind=RKIND) :: simu_time_max
+real(kind=RKIND) :: cfl_number
+real(kind=RKIND) :: timestep
+
+integer :: fault_snap_skip
+integer :: wave_snap_skip
+integer :: grdsurf_snap_skip
+
+integer :: flux_method
+
+integer :: use_damp
+integer :: use_pml
+
+! Friction laws
+! 0 : linear slip weakening (default)
+! 1 : rate state, ageing law
+! 2 : rate state, slip law
+! 3 : rate state, slip law, flash heating
+! 4 : time weakening
+integer :: friction_law
+
+integer :: input_stress_type
+! 0 : stress tensor Sxx0 Syy0 Sxy0
+! 1 : local stress sigma0, tau0
+! 2 : fault traction Tx0, Ty0
+
+real(kind=rkind) :: RS_f0
+real(kind=rkind) :: RS_V0
+real(kind=rkind) :: RS_fw
+
+! off-fault plasticity
+integer :: plasticity
+real(kind=rkind) :: cohesion
+real(kind=rkind) :: blkfric
+real(kind=rkind) :: Tvisc
+real(kind=rkind) :: coef_byy
+real(kind=rkind) :: coef_bxx
+real(kind=rkind) :: coef_bxy
+real(kind=rkind) :: fluidpres_profile_h1
+real(kind=rkind) :: fluidpres_profile_h2
+real(kind=rkind) :: fluidpres_profile_o1
+real(kind=rkind) :: fluidpres_profile_o2
+
+! thermal pressurization
+integer :: thermalpressure
+
+! io
+integer :: export_grdsurf_velo
+integer :: export_grdsurf_displ
+integer :: export_grdsurf_strain
+integer :: export_media
+integer :: export_wave
+integer :: export_wave_component
+integer :: export_wave_timestep
+
+! smoothly loading stress perturbation: T0+coef*dT0
+integer :: smooth_load
+real(kind=RKIND) :: smooth_load_time
+
+! Initial condition
+integer :: initial_condition_wave
+real(kind=rkind) :: src_loc(3)
+real(kind=rkind) :: src_gaussian_width
+real(kind=rkind) :: src_mxx
+real(kind=rkind) :: src_myy
+real(kind=rkind) :: src_mzz
+real(kind=rkind) :: src_myz
+real(kind=rkind) :: src_mxz
+real(kind=rkind) :: src_mxy
+real(kind=rkind) :: src_m0
+
+! parameters for time weakening law
+real(kind=rkind) :: nucleate_y0
+real(kind=rkind) :: nucleate_z0
+real(kind=rkind) :: nucleate_rcrit
+real(kind=rkind) :: nucleate_Vrup
+real(kind=rkind) :: TimeForcedRup
 
 contains
 
