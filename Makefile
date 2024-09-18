@@ -5,10 +5,6 @@ OBJDIR := ./obj
 
 EXE := exe_solver
 
-# WEAK or STRONG form, default is STRONG, WEAK only works for PSV+STRESS case
-# PSV or SH, must select one
-# STRIAN or STRESS form, must select one
-# for SH case: SH+STRIAN
 BLAS := /opt/homebrew/opt/openblas
 NETCDF := /opt/homebrew/opt/netcdf
 NETCDFF := /opt/homebrew/opt/netcdf-fortran
@@ -16,15 +12,6 @@ NETCDFF := /opt/homebrew/opt/netcdf-fortran
 pOrder := 4
 
 FC := mpif90 -O3 -cpp -DpOrder=$(pOrder) -DPSV -DSTRAIN # -DVERSION1  # -DSYM # -DFD
-#FC := gfortran -Wall -O3 -cpp -DSTRESS -DPSV
-
-#-fopenmp
-#LDFLAGS := -lblas -llapack
-#LDFLAGS := -L. -lblas -L. -llapack
-#LDFLAGS := -Bstatic -L. -lblas -L. -llapack
-#LDFLAGS := -L. -lblas -L. -llapack
-#LDFLAGS := libblas.a liblapack.a
-#LDFLAGS := -Llapack-3.9.1 -llapack -lrefblas
 LDFLAGS := -L${BLAS}/lib -lopenblas -L${BLAS}/lib -llapack -L${NETCDF}/lib -lnetcdf -L${NETCDFF}/lib -lnetcdff
 INC := -I${BLAS}/include -I$(NETCDFF)/include
 #LDFLAGS := -mkl
