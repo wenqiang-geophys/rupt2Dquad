@@ -2,20 +2,20 @@ clc
 clear
 close all
 
-%% determine quad lists (QUAD4) and fault boundary curves (BAR2)
+%% identify quad lists (QUAD4) and fault boundary curves (BAR2)
 % first, ncdisp('your_mesh_file.exo') to list all "BAR2" and "QUAD4"
-% then, use the following scripts to determine which connectX is the fault
+% then, use the following scripts to identify which connectX is the fault
 % boundary curve
 % alternatively, you can use paraview to do this, but I think this script
 % is enough for users
 
-fnm = 'tpv5_2d_symm.exo';
+fnm = 'tpv28_2d.exo';
 
 coord = ncread(fnm,'coord');
 node = coord(:,1:2)';
 Nnode = size(node,1);
 
-quad_list = [10];
+quad_list = [6];
 elem = [];
 for i = 1:length(quad_list)
     elem1 = ncread(fnm,['connect',num2str(quad_list(i))]);
