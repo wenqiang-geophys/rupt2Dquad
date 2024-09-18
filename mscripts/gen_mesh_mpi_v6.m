@@ -216,8 +216,8 @@ for iproc = nproc:-1:1
             db(iproc).rho(l) = mesh.rho(ie);
             db(iproc).vp(l) = mesh.vp(ie);
             db(iproc).vs(l) = mesh.vs(ie);
-            db(iproc).zp(l) = mesh.zp(ie);
-            db(iproc).zs(l) = mesh.zs(ie);
+            % db(iproc).zp(l) = mesh.zp(ie);
+            % db(iproc).zs(l) = mesh.zs(ie);
             % db(iproc).x(:,:,l)=mesh.x(:,:,ie);
             % db(iproc).y(:,:,l)=mesh.y(:,:,ie);
             % db(iproc).rx(:,:,l)=mesh.rx(:,:,ie);
@@ -398,48 +398,48 @@ for iproc = 1:nproc
     end
 end
 
-% fault recvs
-nrecv = mesh.nrecv;
-db(iproc).recv_fid = [];
-db(iproc).recv_i = [];
-db(iproc).recv_refx = [];
-db(iproc).recv_ie = [];
-
-for iproc = 1:nproc
-    db(iproc).recv_number = 0;
-    k = 0;
-    for i = 1:nrecv
-        ie = mesh.recv_ie(i);
-        if (part(ie)== iproc)
-            k = k + 1;
-            db(iproc).recv_fid(k)=i;
-            db(iproc).recv_i(k)=mesh.recv_i(i);
-            db(iproc).recv_refx(k)=mesh.recv_refx(i);
-            %db(iproc).recv_j(k)=mesh.recv_j(i);
-            db(iproc).recv_ie(k)= glob2loc_elmnts(ie);
-        end
-        db(iproc).recv_number = k;
-    end
-end
-% body recvs
-nrecv = mesh.body_nrecv;
-for iproc = 1:nproc
-    db(iproc).body_recv_number = 0;
-    k = 0;
-    for i = 1:nrecv
-        ie = mesh.body_recv_ie(i);
-        if (part(ie)== iproc)
-            k = k + 1;
-            db(iproc).body_recv_fid(k)=i;
-            db(iproc).body_recv_i(k)=mesh.body_recv_i(i);
-            db(iproc).body_recv_j(k)=mesh.body_recv_j(i);
-            db(iproc).body_recv_refx(k)=mesh.body_recv_refx(i);
-            db(iproc).body_recv_refy(k)=mesh.body_recv_refy(i);
-            db(iproc).body_recv_ie(k)= glob2loc_elmnts(ie);
-        end
-        db(iproc).body_recv_number = k;
-    end
-end
+%% fault recvs
+%nrecv = mesh.nrecv;
+%db(iproc).recv_fid = [];
+%db(iproc).recv_i = [];
+%db(iproc).recv_refx = [];
+%db(iproc).recv_ie = [];
+%
+%for iproc = 1:nproc
+%    db(iproc).recv_number = 0;
+%    k = 0;
+%    for i = 1:nrecv
+%        ie = mesh.recv_ie(i);
+%        if (part(ie)== iproc)
+%            k = k + 1;
+%            db(iproc).recv_fid(k)=i;
+%            db(iproc).recv_i(k)=mesh.recv_i(i);
+%            db(iproc).recv_refx(k)=mesh.recv_refx(i);
+%            %db(iproc).recv_j(k)=mesh.recv_j(i);
+%            db(iproc).recv_ie(k)= glob2loc_elmnts(ie);
+%        end
+%        db(iproc).recv_number = k;
+%    end
+%end
+%% body recvs
+%nrecv = mesh.body_nrecv;
+%for iproc = 1:nproc
+%    db(iproc).body_recv_number = 0;
+%    k = 0;
+%    for i = 1:nrecv
+%        ie = mesh.body_recv_ie(i);
+%        if (part(ie)== iproc)
+%            k = k + 1;
+%            db(iproc).body_recv_fid(k)=i;
+%            db(iproc).body_recv_i(k)=mesh.body_recv_i(i);
+%            db(iproc).body_recv_j(k)=mesh.body_recv_j(i);
+%            db(iproc).body_recv_refx(k)=mesh.body_recv_refx(i);
+%            db(iproc).body_recv_refy(k)=mesh.body_recv_refy(i);
+%            db(iproc).body_recv_ie(k)= glob2loc_elmnts(ie);
+%        end
+%        db(iproc).body_recv_number = k;
+%    end
+%end
 
 % counting fault elems
 for iproc = 1:nproc

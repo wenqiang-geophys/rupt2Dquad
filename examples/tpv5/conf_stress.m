@@ -5,10 +5,13 @@ clear
 addpath(genpath('../../mscripts'));
 myconstants;
 
-nproc = 4;
+par = ReadYaml('parameters.yaml');
+nproc = par.nproc;
+mesh_dir = par.mesh_dir;
+
 for iproc = 0:nproc-1
 
-    fnm_out = ['data/meshVar',num2str(iproc,'%06d'),'.nc'];
+    fnm_out = [mesh_dir,'/meshVar',num2str(iproc,'%06d'),'.nc'];
 
     node = ncread(fnm_out,'node');
     elem = ncread(fnm_out,'elem');
@@ -24,11 +27,10 @@ for iproc = 0:nproc-1
 
     Nelem = size(elem,2);
     Nnode = size(node,2);
-    Nelem_fault = size(Sxx,3);
+    Nelem_fault = numel(fault2wave);
     fprintf('iproc=%d,Nelem=%d,Nnode=%d,Nelem_fault=%d\n', ...
         iproc,Nelem,Nnode,Nelem_fault);
 
-    ief = 0;
     X = Sxx * 0;
     for ief = 1:Nelem_fault
     %for ie = 1:Nelem
@@ -86,6 +88,7 @@ for iproc = 0:nproc-1
     var6 = netcdf.inqVarID(ncid,'Dc');
     var7 = netcdf.inqVarID(ncid,'C0');
 
+    if (Nelem_fault > 0)
     netcdf.putVar(ncid,var1,Sxx);
     netcdf.putVar(ncid,var2,Syy);
     netcdf.putVar(ncid,var3,Sxy);
@@ -93,6 +96,7 @@ for iproc = 0:nproc-1
     netcdf.putVar(ncid,var5,mu_d);
     netcdf.putVar(ncid,var6,Dc);
     netcdf.putVar(ncid,var7,C0);
+    end
 
     netcdf.close(ncid);
 

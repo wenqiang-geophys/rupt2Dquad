@@ -38,9 +38,9 @@ subroutine init_pml(mesh,rank)
     bmax2 = 1
     dmax2 = 0
 
-    print*,'amax=',amax
-    print*,'bmax=',bmax
-    print*,'dmax=',dmax
+    !print*,'amax=',amax
+    !print*,'bmax=',bmax
+    !print*,'dmax=',dmax
 
 #ifdef TPV5
     axisLimits = (/-30d3,30d3,-20d3,20d3/)
@@ -175,35 +175,35 @@ subroutine init_pml(mesh,rank)
         end do
     end do
 
-    write(filename,'(a,i6.6)') 'data/ispml',rank
-    open(100,file=trim(filename),access='stream',form='unformatted',status='unknown')
-    write(100) real(mesh%ispml)
-    close(100)
+    !write(filename,'(a,i6.6)') 'data/ispml',rank
+    !open(100,file=trim(filename),access='stream',form='unformatted',status='unknown')
+    !write(100) real(mesh%ispml)
+    !close(100)
 
-    write(filename,'(a,i6.6)') 'data/pax',rank
-    open(100,file=trim(filename),access='stream',form='unformatted',status='unknown')
-    write(100) sngl(mesh%pax)
-    close(100)
-    write(filename,'(a,i6.6)') 'data/pbx',rank
-    open(100,file=trim(filename),access='stream',form='unformatted',status='unknown')
-    write(100) sngl(mesh%pbx)
-    close(100)
-    write(filename,'(a,i6.6)') 'data/pdx',rank
-    open(100,file=trim(filename),access='stream',form='unformatted',status='unknown')
-    write(100) sngl(mesh%pdx)
-    close(100)
-    write(filename,'(a,i6.6)') 'data/pay',rank
-    open(100,file=trim(filename),access='stream',form='unformatted',status='unknown')
-    write(100) sngl(mesh%pay)
-    close(100)
-    write(filename,'(a,i6.6)') 'data/pby',rank
-    open(100,file=trim(filename),access='stream',form='unformatted',status='unknown')
-    write(100) sngl(mesh%pby)
-    close(100)
-    write(filename,'(a,i6.6)') 'data/pdy',rank
-    open(100,file=trim(filename),access='stream',form='unformatted',status='unknown')
-    write(100) sngl(mesh%pdy)
-    close(100)
+    !write(filename,'(a,i6.6)') 'data/pax',rank
+    !open(100,file=trim(filename),access='stream',form='unformatted',status='unknown')
+    !write(100) sngl(mesh%pax)
+    !close(100)
+    !write(filename,'(a,i6.6)') 'data/pbx',rank
+    !open(100,file=trim(filename),access='stream',form='unformatted',status='unknown')
+    !write(100) sngl(mesh%pbx)
+    !close(100)
+    !write(filename,'(a,i6.6)') 'data/pdx',rank
+    !open(100,file=trim(filename),access='stream',form='unformatted',status='unknown')
+    !write(100) sngl(mesh%pdx)
+    !close(100)
+    !write(filename,'(a,i6.6)') 'data/pay',rank
+    !open(100,file=trim(filename),access='stream',form='unformatted',status='unknown')
+    !write(100) sngl(mesh%pay)
+    !close(100)
+    !write(filename,'(a,i6.6)') 'data/pby',rank
+    !open(100,file=trim(filename),access='stream',form='unformatted',status='unknown')
+    !write(100) sngl(mesh%pby)
+    !close(100)
+    !write(filename,'(a,i6.6)') 'data/pdy',rank
+    !open(100,file=trim(filename),access='stream',form='unformatted',status='unknown')
+    !write(100) sngl(mesh%pdy)
+    !close(100)
 
 end subroutine
 

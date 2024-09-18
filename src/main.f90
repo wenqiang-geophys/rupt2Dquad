@@ -115,7 +115,7 @@ data_dir = 'data'
 !end if
 !stop 2
 
-call write_mesh(mesh,myrank)
+!call write_mesh(mesh,myrank)
 
 call init_damp(mesh,myrank)
 call init_pml(mesh,myrank)
@@ -243,14 +243,14 @@ if(myrank==0) print*,'tskip = ',tskip
 
 wave_snap_skip = tskip
 
-do i = 1,mesh%nrecv
-    write(filename,'(a,i6.6,a)') 'data/recv_id',mesh%recv_fid(i),'.txt'
-    open(100+i,file=trim(filename))
-enddo
-do i = 1,mesh%body_nrecv
-    write(filename,'(a,i6.6,a)') 'data/body_recv_id',mesh%body_recv_fid(i),'.txt'
-    open(900+i,file=trim(filename))
-enddo
+!do i = 1,mesh%nrecv
+!    write(filename,'(a,i6.6,a)') 'data/recv_id',mesh%recv_fid(i),'.txt'
+!    open(100+i,file=trim(filename))
+!enddo
+!do i = 1,mesh%body_nrecv
+!    write(filename,'(a,i6.6,a)') 'data/body_recv_id',mesh%body_recv_fid(i),'.txt'
+!    open(900+i,file=trim(filename))
+!enddo
 
 !do i = 1,mesh%nelem
 !    do is = 1,nsurface
@@ -278,27 +278,27 @@ enddo
 !    end do
 !enddo
 
-write(filename,'(a,i6.6,a)') 'data/fault_mpi',myrank,'.txt'
-open(1000+myrank,file=trim(filename))
-write(1000+myrank,*) mesh%fault_buffer(:,:,1)
-write(1000+myrank,*) mesh%fault_buffer(:,:,2)
-write(1000+myrank,*) mesh%fault_buffer(:,:,3)
-write(1000+myrank,*) mesh%fault_buffer(:,:,4)
-
-write(filename,'(a,i6.6,a)') 'data/stress_mpi',myrank,'.txt'
-open (3000+myrank,file=trim(filename))
-write(3000+myrank,*) mesh%fault_buffer(:,:,1)
-write(3000+myrank,*) mesh%fault_buffer(:,:,2)
-write(3000+myrank,*) mesh%fault_buffer(:,:,3)
-write(3000+myrank,*) mesh%fault_buffer(:,:,4)
-!close(1000+myrank)
-
-write(filename,'(a,i6.6,a)') 'data/surface_mpi',myrank,'.txt'
-open (2000+myrank,file=trim(filename))
-write(2000+myrank,*) mesh%surface_buffer(:,:,1)
-write(2000+myrank,*) mesh%surface_buffer(:,:,2)
-write(2000+myrank,*) mesh%surface_buffer(:,:,3)
-write(2000+myrank,*) mesh%surface_buffer(:,:,4)
+!write(filename,'(a,i6.6,a)') 'data/fault_mpi',myrank,'.txt'
+!open(1000+myrank,file=trim(filename))
+!write(1000+myrank,*) mesh%fault_buffer(:,:,1)
+!write(1000+myrank,*) mesh%fault_buffer(:,:,2)
+!write(1000+myrank,*) mesh%fault_buffer(:,:,3)
+!write(1000+myrank,*) mesh%fault_buffer(:,:,4)
+!
+!write(filename,'(a,i6.6,a)') 'data/stress_mpi',myrank,'.txt'
+!open (3000+myrank,file=trim(filename))
+!write(3000+myrank,*) mesh%fault_buffer(:,:,1)
+!write(3000+myrank,*) mesh%fault_buffer(:,:,2)
+!write(3000+myrank,*) mesh%fault_buffer(:,:,3)
+!write(3000+myrank,*) mesh%fault_buffer(:,:,4)
+!!close(1000+myrank)
+!
+!write(filename,'(a,i6.6,a)') 'data/surface_mpi',myrank,'.txt'
+!open (2000+myrank,file=trim(filename))
+!write(2000+myrank,*) mesh%surface_buffer(:,:,1)
+!write(2000+myrank,*) mesh%surface_buffer(:,:,2)
+!write(2000+myrank,*) mesh%surface_buffer(:,:,3)
+!write(2000+myrank,*) mesh%surface_buffer(:,:,4)
 
 call MPI_Barrier(MPI_COMM_WORLD,ierr)
 
@@ -494,38 +494,38 @@ do it = 1,nt
 
     mesh%eta = mesh%eta + mesh%deta * dt
 
-    do irecv = 1,mesh%nrecv
-        tmpu1 = 0
-        tmpu2 = 0
-        tmpu3 = 0
-        do i = 1,Ngrid
-            li=lagrange_basis(Ngrid,i,mesh%recv_refx(irecv),mesh%xnode)
-            tmpu1 = tmpu1 + mesh%recv_buffer(irecv,i,1)*li 
-            tmpu2 = tmpu2 + mesh%recv_buffer(irecv,i,2)*li 
-            tmpu3 = tmpu3 + mesh%recv_buffer(irecv,i,3)*li 
-        end do
+    !do irecv = 1,mesh%nrecv
+    !    tmpu1 = 0
+    !    tmpu2 = 0
+    !    tmpu3 = 0
+    !    do i = 1,Ngrid
+    !        li=lagrange_basis(Ngrid,i,mesh%recv_refx(irecv),mesh%xnode)
+    !        tmpu1 = tmpu1 + mesh%recv_buffer(irecv,i,1)*li 
+    !        tmpu2 = tmpu2 + mesh%recv_buffer(irecv,i,2)*li 
+    !        tmpu3 = tmpu3 + mesh%recv_buffer(irecv,i,3)*li 
+    !    end do
 
-        write(100+irecv,*) mesh%current_time,tmpu1,tmpu2,tmpu3
-        !write(100+irecv,*) mesh%current_time,mesh%recv_buffer(irecv,1:3)
+    !    write(100+irecv,*) mesh%current_time,tmpu1,tmpu2,tmpu3
+    !    !write(100+irecv,*) mesh%current_time,mesh%recv_buffer(irecv,1:3)
 
-    end do
-    do irecv = 1,mesh%body_nrecv
-        tmpu1 = 0
-        tmpu2 = 0
-        do i = 1,Ngrid
-            do j = 1,Ngrid
-                li=lagrange_basis(Ngrid,i,mesh%body_recv_refx(irecv),mesh%xnode)
-                lj=lagrange_basis(Ngrid,j,mesh%body_recv_refy(irecv),mesh%xnode)
-                tmpu1 = tmpu1 + wave%u(i+(j-1)*Ngrid,mesh%body_recv_ie(irecv),1)*li*lj
-                tmpu2 = tmpu2 + wave%u(i+(j-1)*Ngrid,mesh%body_recv_ie(irecv),2)*li*lj
-            end do
-        end do
-        !tmpu1 = tmpu1 / mesh%rho(mesh%body_recv_ie(irecv))
-        !tmpu2 = tmpu2 / mesh%rho(mesh%body_recv_ie(irecv))
-        write(900+irecv,*) mesh%current_time,&
-            tmpu1,tmpu2
-            !u(mesh%body_recv_i(irecv),mesh%body_recv_j(irecv),mesh%body_recv_ie(irecv),1:2)
-    end do
+    !end do
+    !do irecv = 1,mesh%body_nrecv
+    !    tmpu1 = 0
+    !    tmpu2 = 0
+    !    do i = 1,Ngrid
+    !        do j = 1,Ngrid
+    !            li=lagrange_basis(Ngrid,i,mesh%body_recv_refx(irecv),mesh%xnode)
+    !            lj=lagrange_basis(Ngrid,j,mesh%body_recv_refy(irecv),mesh%xnode)
+    !            tmpu1 = tmpu1 + wave%u(i+(j-1)*Ngrid,mesh%body_recv_ie(irecv),1)*li*lj
+    !            tmpu2 = tmpu2 + wave%u(i+(j-1)*Ngrid,mesh%body_recv_ie(irecv),2)*li*lj
+    !        end do
+    !    end do
+    !    !tmpu1 = tmpu1 / mesh%rho(mesh%body_recv_ie(irecv))
+    !    !tmpu2 = tmpu2 / mesh%rho(mesh%body_recv_ie(irecv))
+    !    write(900+irecv,*) mesh%current_time,&
+    !        tmpu1,tmpu2
+    !        !u(mesh%body_recv_i(irecv),mesh%body_recv_j(irecv),mesh%body_recv_ie(irecv),1:2)
+    !end do
 
     !do i = 1,mesh%nelem
     !    do is = 1,nsurface
@@ -543,50 +543,50 @@ do it = 1,nt
     !        end if
     !    end do
     !enddo
-    if (mod(it-1,5) == 0) then
-    k = 0
-    do i = 1,mesh%nelem
-        do is = 1,nsurface
-            if (mesh%bctype(is,i)>=BC_FAULT) then
-                k = k + 1
-                mesh%fault_buffer(:,k,1) = mesh%sliprate(:,is,i)
-                !mesh%fault_buffer(:,k,1) = (s(:,is,i)-ms(:,is,i))/dt
-            end if
-        end do
-    end do
-    write(1000+myrank,*) mesh%fault_buffer(:,:,1)
+    !if (mod(it-1,5) == 0) then
+    !k = 0
+    !do i = 1,mesh%nelem
+    !    do is = 1,nsurface
+    !        if (mesh%bctype(is,i)>=BC_FAULT) then
+    !            k = k + 1
+    !            mesh%fault_buffer(:,k,1) = mesh%sliprate(:,is,i)
+    !            !mesh%fault_buffer(:,k,1) = (s(:,is,i)-ms(:,is,i))/dt
+    !        end if
+    !    end do
+    !end do
+    !write(1000+myrank,*) mesh%fault_buffer(:,:,1)
 
-    k = 0
-    do i = 1,mesh%nelem
-        do is = 1,nsurface
-            if (mesh%bctype(is,i)>=BC_FAULT) then
-                k = k + 1
-                mesh%fault_buffer(:,k,1) = mesh%stress(:,is,i)
-                !mesh%fault_buffer(:,k,1) = (s(:,is,i)-ms(:,is,i))/dt
-            end if
-        end do
-    end do
-    write(3000+myrank,*) mesh%fault_buffer(:,:,1)
+    !k = 0
+    !do i = 1,mesh%nelem
+    !    do is = 1,nsurface
+    !        if (mesh%bctype(is,i)>=BC_FAULT) then
+    !            k = k + 1
+    !            mesh%fault_buffer(:,k,1) = mesh%stress(:,is,i)
+    !            !mesh%fault_buffer(:,k,1) = (s(:,is,i)-ms(:,is,i))/dt
+    !        end if
+    !    end do
+    !end do
+    !write(3000+myrank,*) mesh%fault_buffer(:,:,1)
 
-    k = 0
-    do i = 1,mesh%nelem
-        do is = 1,nsurface
-            if (mesh%bctype(is,i)==BC_FREE .or. mesh%bctype(is,i)==BC_FREE_G) then
-                k = k + 1
-                mesh%surface_buffer(:,k,1) = mesh%eta(:,is,i)
-            end if
-        end do
-    end do
-    write(2000+myrank,*) mesh%surface_buffer(:,:,1)
-    end if
+    !k = 0
+    !do i = 1,mesh%nelem
+    !    do is = 1,nsurface
+    !        if (mesh%bctype(is,i)==BC_FREE .or. mesh%bctype(is,i)==BC_FREE_G) then
+    !            k = k + 1
+    !            mesh%surface_buffer(:,k,1) = mesh%eta(:,is,i)
+    !        end if
+    !    end do
+    !end do
+    !write(2000+myrank,*) mesh%surface_buffer(:,:,1)
+    !end if
 
-    if (mod(it-1,tskip)==0) then
+    !if (mod(it-1,tskip)==0) then
         !if (myrank==0) print*,it,'/',nt
     !    !if (myrank==0) print*,nt
 
         !if(myrank==0) print*,'writing data/wave @ it = ',it
         !call write_wave(u,myrank,1)
-    end if
+    !end if
 
 
     if (mod(it-1,fault_snap_skip) == 0) then
@@ -612,12 +612,12 @@ call fault_io_end(mesh)
 call wave_io_end(mesh)
 
 call MPI_Barrier(MPI_COMM_WORLD,ierr)
-do i = 1,mesh%nrecv
-    close(100+i)
-end do
-do i = 1,mesh%body_nrecv
-    close(900+i)
-end do
+!do i = 1,mesh%nrecv
+!    close(100+i)
+!end do
+!do i = 1,mesh%body_nrecv
+!    close(900+i)
+!end do
 
 call MPI_Finalize(ierr)
 

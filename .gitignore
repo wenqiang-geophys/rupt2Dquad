@@ -42,4 +42,6 @@ fort.*
 *.exo
 *.inp
 
+path.*
+
 .DS_Store

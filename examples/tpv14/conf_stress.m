@@ -5,10 +5,14 @@ clear
 addpath(genpath('../../mscripts'));
 myconstants;
 
-nproc = 4;
+par = ReadYaml('parameters.yaml');
+nproc = par.nproc;
+mesh_dir = par.mesh_dir;
+%data_dir = par.data_dir;
+
 for iproc = 0:nproc-1
 
-    fnm_out = ['data/meshVar',num2str(iproc,'%06d'),'.nc'];
+    fnm_out = [mesh_dir,'/meshVar',num2str(iproc,'%06d'),'.nc'];
 
     node = ncread(fnm_out,'node');
     elem = ncread(fnm_out,'elem');
@@ -23,16 +27,11 @@ for iproc = 0:nproc-1
 
     Nelem = size(elem,2);
     Nnode = size(node,2);
-    if (isempty(fault2wave))
-        Nelem_fault = 0;
-    else
-        Nelem_fault = length(fault2wave);
-    end
+    Nelem_fault = numel(fault2wave);
     fprintf('iproc=%d,Nelem=%d,Nnode=%d,Nelem_fault=%d\n', ...
         iproc,Nelem,Nnode,Nelem_fault);
 
-    ief = 1;
-    isfault=0;
+
     for ief = 1:Nelem_fault
         ie = fault2wave(ief);
         % calculate normal vectors
@@ -57,16 +56,15 @@ for iproc = 0:nproc-1
                     y = node(2,elem(j,ie));
 
                     sigma = -120e6;
-                    tau = 70e6;
+                    tau = -70e6;
                     if (abs(x+8e3)<1.5e3)
-                        tau = 81.6e6;
+                        tau = -81.6e6;
                     end
 
                     %if (vec_n(2)<0)
                         %tau = -tau;
                         %sigma = -sigma;
                     %end
-                    tau = -tau;
 
                     sigma0(i,is,ief) = sigma;
                     tau0(i,is,ief) = tau;

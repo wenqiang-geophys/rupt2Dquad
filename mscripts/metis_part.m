@@ -45,15 +45,15 @@ elseif (metis_version == 5)
     %metis_dir = '/usr/local/bin';
     %metis_dir = '/home/wzhang/spack/opt/spack/linux-ubuntu20.04-cascadelake/gcc-9.4.0/metis-5.1.0-g3hkcjmmfvljvil6u6okitnlxozpw3mn/bin';
 
-    %exe = strtrim(fileread('../../path.m2gmetis'));
+    exe = strtrim(fileread('../../path.m2gmetis'));
     cmd = sprintf('%s/m2gmetis tmp.met tmp.met.dgraph',metis_dir);
-    %cmd = sprintf('%s tmp.met tmp.met.dgraph',exe);
+    cmd = sprintf('%s tmp.met tmp.met.dgraph',exe);
     disp(cmd);
     system(cmd);
 
-    %exe = strtrim(fileread('../../path.gpmetis'));
+    exe = strtrim(fileread('../../path.gpmetis'));
     cmd = sprintf('%s/gpmetis tmp.met.dgraph %d',metis_dir,np);
-    %cmd = sprintf('%s tmp.met.dgraph %d',exe,np);
+    cmd = sprintf('%s tmp.met.dgraph %d',exe,np);
     disp(cmd);
     system(cmd);
 

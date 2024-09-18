@@ -11,14 +11,13 @@ par = ReadYaml('parameters.yaml');
 nproc = par.nproc;
 data_dir = par.data_dir;
 
-fnm = 'tpv5_2d.exo';
-fnm = 'tpv5_2d_symm.exo';
+fnm = 'tpv14_2d.exo';
 coord = ncread(fnm,'coord');
 node = coord(:,1:2);
 Nnode = size(node,1);
 
-quad_list = [6];
-quad_list = [10];
+%quad_list = [10,11,12];
+quad_list = [5];
 elem = [];
 for i = 1:length(quad_list)
     elem1 = ncread(fnm,['connect',num2str(quad_list(i))]);
@@ -28,8 +27,9 @@ end
 
 elem = ccw_sort(node,elem'); elem = elem';
 
-fault_bdr_list = [1];
-%elem_fault = [];
+%fault_bdr_list = [5,6,8];
+fault_bdr_list = [1,2,3];
+elem_fault = [];
 bc1 = zeros(4,Nelem);
 for i = 1:length(fault_bdr_list)
     elem1 = ncread(fnm,['connect',num2str(fault_bdr_list(i))]);

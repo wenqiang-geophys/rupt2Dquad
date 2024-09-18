@@ -89,10 +89,10 @@ subroutine init_damp(mesh,rank)
         end do
     end do
 
-    write(filename,'(a,i6.6)') 'data/damp',rank
-    open(100,file=trim(filename),access='stream',form='unformatted',status='unknown')
-    write(100) sngl(mesh%damp)
-    close(100)
+    !write(filename,'(a,i6.6)') 'data/damp',rank
+    !open(100,file=trim(filename),access='stream',form='unformatted',status='unknown')
+    !write(100) sngl(mesh%damp)
+    !close(100)
 
 end subroutine
 

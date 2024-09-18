@@ -13,7 +13,9 @@ BLAS := /opt/homebrew/opt/openblas
 NETCDF := /opt/homebrew/opt/netcdf
 NETCDFF := /opt/homebrew/opt/netcdf-fortran
 
-FC := mpif90 -O3 -cpp -DpOrder=4 -DPSV -DSTRAIN # -DVERSION1  # -DSYM # -DFD
+pOrder := 4
+
+FC := mpif90 -O3 -cpp -DpOrder=$(pOrder) -DPSV -DSTRAIN # -DVERSION1  # -DSYM # -DFD
 #FC := gfortran -Wall -O3 -cpp -DSTRESS -DPSV
 
 #-fopenmp

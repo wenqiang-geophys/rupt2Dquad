@@ -24,7 +24,7 @@ elem = mesh.elem;
 Nelem = size(elem,1);
 Nnode = size(node,1);
 
-elem = ccw_sort(node,elem);
+%elem = ccw_sort(node,elem);
 
 [EtoE,EtoF] = tiConnect2D_quad(elem);
 % clean neighbor array

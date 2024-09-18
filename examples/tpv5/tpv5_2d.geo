@@ -1,15 +1,14 @@
 //+
 SetFactory("OpenCASCADE");
-Point(1) = {-15, 0, 0, 1.0};
-Point(2) = {+15, 0, 0, 1.0};
+Point(1) = {-15e3, 0, 0, 1.0};
+Point(2) = {+15e3, 0, 0, 1.0};
 Line(1) = {1, 2};
-//Rectangle(1) = {-75, -50, 0, 150, 100, 0};
-Rectangle(1) = {-50, -40, 0, 100, 80, 0};
+Rectangle(1) = {-50e3, -40e3, 0, 100e3, 80e3, 0};
 //+
 BooleanFragments{ Surface{1}; Delete; }{ Curve{1}; Delete; }
 
-MeshSize {:} = 10;
-MeshSize {1,2} = 1;
+MeshSize {:} = 10e3;
+MeshSize {1,2} = 1e3;
 
 // "Frontal-Delaunay" 2D meshing algorithm (Mesh.Algorithm = 6)
 // usually leads to the highest quality meshes, the
