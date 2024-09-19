@@ -18,6 +18,7 @@ BooleanFragments{ Surface{1}; Delete; }{ Curve{1:3}; Delete; }
 MeshSize {:} = boundsize;
 MeshSize {1:4} = faultsize;
 //+
-Mesh.Algorithm = 6; // Frontal-Delaunay
+//Mesh.Algorithm = 6; // Frontal-Delaunay
+Mesh.Algorithm = 9; //  Packing of Parallelograms
 Mesh.RecombinationAlgorithm = 2;
-Recombine Surface {:};
+Mesh.RecombineAll = 1;
