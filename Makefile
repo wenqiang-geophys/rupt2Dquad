@@ -5,14 +5,27 @@ OBJDIR := ./obj
 
 EXE := exe_solver
 
-BLAS := /opt/homebrew/opt/openblas
+# Order of accuracy O = pOrder+1
+pOrder := 4
+
+# compilation on Sherlock, comment it to test on your laptop
+# module load netcdf-fortran
+# module load flexiblas
+Sherlock := ON
+
+BLAS := /opt/homebrew/opt/flexiblas
 NETCDF := /opt/homebrew/opt/netcdf
 NETCDFF := /opt/homebrew/opt/netcdf-fortran
 
-pOrder := 4
+ifeq "$(Sherlock)" "ON"
+BLAS := /share/software/user/open/flexiblas/3.1.3
+NETCDF := /share/software/user/open/netcdf-c/4.9.0
+NETCDFF := /share/software/user/open/netcdf-fortran/4.5.4
+endif
 
 FC := mpif90 -O3 -cpp -DpOrder=$(pOrder) -DPSV -DSTRAIN # -DVERSION1  # -DSYM # -DFD
-LDFLAGS := -L${BLAS}/lib -lopenblas -L${BLAS}/lib -llapack -L${NETCDF}/lib -lnetcdf -L${NETCDFF}/lib -lnetcdff
+LDFLAGS := -lnetcdf -L${NETCDFF}/lib -lnetcdff
+LDFLAGS := -L${BLAS}/lib -lflexiblas -L${NETCDF}/lib -lnetcdf -L${NETCDFF}/lib -lnetcdff
 INC := -I${BLAS}/include -I$(NETCDFF)/include
 #LDFLAGS := -mkl
 
