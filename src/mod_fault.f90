@@ -89,7 +89,8 @@ subroutine fault_init(mesh)
 
     allocate(mesh%tau_n   (Nfp,Nfaces,mesh%nelem_fault))
     allocate(mesh%tau_0   (Nfp,Nfaces,mesh%nelem_fault))
-    allocate(mesh%stress  (Nfp,Nfaces,mesh%nelem_fault))
+    allocate(mesh%tau     (Nfp,Nfaces,mesh%nelem_fault))
+    allocate(mesh%sigma   (Nfp,Nfaces,mesh%nelem_fault))
     allocate(mesh%Slip    (Nfp,Nfaces,mesh%nelem_fault))
     allocate(mesh%mSlip   (Nfp,Nfaces,mesh%nelem_fault))
     allocate(mesh%tSlip   (Nfp,Nfaces,mesh%nelem_fault))
@@ -367,7 +368,8 @@ subroutine fault_init(mesh)
 
     call fault_init_external(mesh)
 
-    mesh%stress = mesh%tau_0
+    mesh%tau = mesh%tau_0
+    mesh%sigma = mesh%tau_n
 
     !stop 2
     !!!mesh%nelem_fault = nelem_fault

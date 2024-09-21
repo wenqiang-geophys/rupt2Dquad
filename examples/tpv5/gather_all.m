@@ -43,7 +43,7 @@ for iproc = 0:nproc-1
     if (exist(fnm,'file'))
         tf = ncread(fnm, 'time');
         v1 = ncread(fnm, 'rate'); rate = cat(2,rate,v1);
-        v1 = ncread(fnm, 'stress'); stress = cat(2,stress,v1);
+        v1 = ncread(fnm, 'tau'); stress = cat(2,stress,v1);
         v1 = ncread(fnm, 'x'); xf = cat(2,xf,v1);
         v1 = ncread(fnm, 'y'); yf = cat(2,yf,v1);
     end
@@ -51,7 +51,7 @@ end
 [~,Nelem_fault,Nt_fault] = size(rate);
 
 fnm = 'data_tpv5.nc';
-system(['rm -r ',fnm]);
+system(['rm -f ',fnm]);
 ncid = netcdf.create(fnm,'netcdf4');%'CLOBBER'
 
 waveGrpId = netcdf.defGrp(ncid,"wave");

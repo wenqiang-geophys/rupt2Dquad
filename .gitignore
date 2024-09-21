@@ -36,6 +36,7 @@ bin
 obj
 
 data
+data_*
 fort.*
 
 # mesh file

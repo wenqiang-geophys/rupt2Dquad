@@ -7,7 +7,7 @@ nproc = par.nproc;
 data_dir = par.data_dir;
 
 %varnm = 'stress';
-varnm = 'rate';
+varnm = 'sigma';
 fault_segment_id = 1;
 
 x = []; y = []; v = [];

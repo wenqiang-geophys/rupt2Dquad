@@ -256,7 +256,8 @@ subroutine get_flux(mesh,u,du,uax,uay,i,is,ie,qi,fstar)
                 vm_hat_p, vm_hat_m, Tm_hat_p, Tm_hat_m, &
                 Tau_n, tau_0, Slip, vv, Dc, mu_s, mu_d)
         mesh%sliprate(i,is,ief) = abs(vv)
-        mesh%stress(i,is,ief) = Tm_hat_m+Tau_0
+        mesh%tau(i,is,ief) = Tm_hat_m+Tau_0
+        mesh%sigma(i,is,ief) = Tn_hat_m+Tau_n
 
         ! save current time fault recvs
         do n = 1,mesh%nrecv

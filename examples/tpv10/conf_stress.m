@@ -58,7 +58,7 @@ for iproc = 0:nproc-1
 
                     mu_s1 = 0.76;
                     % tpv11
-                    mu_s1 = 0.57;
+                    % mu_s1 = 0.57;
 
                     d = sqrt(x^2+y^2);
                     d = max(d,1e-3);

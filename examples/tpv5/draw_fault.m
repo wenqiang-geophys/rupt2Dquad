@@ -2,16 +2,10 @@ clc
 close all
 clear
 
-nproc = 4;
-varnm = 'stress';
+par = ReadYaml('parameters.yaml');
+nproc = par.nproc;
+data_dir = par.data_dir;
 varnm = 'rate';
-%data_dir = 'data_500_20000_v1'
-data_dir = 'data'
-%data_dir = 'data_500_20000_llf_pOrder8'
-
-%key1 = 'symm_upwind'
-%data_dir = ['data_',key1];
-
 
 x = []; y = []; v = [];
 for i = 1:nproc
@@ -23,11 +17,10 @@ for i = 1:nproc
     y1 = ncread(fnm, 'y');
     v1 = ncread(fnm, varnm);
     t = ncread(fnm, 'time');
-    
 
-    x = [x,x1];
-    y = [y,y1];
-    v = [v,v1];
+    x = cat(2,x,x1);
+    y = cat(2,y,y1);
+    v = cat(2,v,v1);
     end
 
 end
