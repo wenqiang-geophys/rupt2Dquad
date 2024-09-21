@@ -6,12 +6,12 @@ OBJDIR := ./obj
 EXE := exe_solver
 
 # Order of accuracy O = pOrder+1
-pOrder := 4
+pOrder := 3
 
 # compilation on Sherlock, comment it to test on your laptop
 # module load netcdf-fortran
 # module load flexiblas
-Sherlock := ON
+#Sherlock := ON
 
 BLAS := /opt/homebrew/opt/flexiblas
 NETCDF := /opt/homebrew/opt/netcdf
@@ -47,6 +47,7 @@ SRC := yaml_types.f90       \
        mod_wave.f90         \
        mod_init_fault.f90   \
        mod_fault.f90        \
+       mod_plastic.f90      \
        mod_mpi.f90          \
        mod_exchange.f90     \
        mod_damp.f90         \

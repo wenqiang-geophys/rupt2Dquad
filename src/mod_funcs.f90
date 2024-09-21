@@ -694,4 +694,37 @@ function interp1d(v1,v2,c1,c2,p) result (cp)
     cp=c1+r*(c2-c1)
 end function
 
+subroutine strain2stress(exx,eyy,exy,rho,cp,cs,sxx,syy,sxy)
+  implicit none
+  real(kind=RKIND),intent(in) :: exx,eyy,exy,rho,cp,cs
+  real(kind=RKIND),intent(out) :: sxx,syy,sxy
+  real(kind=rkind) :: miu,lam,chi
+  miu = rho*cs**2
+  chi = rho*cp**2
+  lam = chi-2d0*miu
+
+  sxx = exx * chi + eyy * lam
+  syy = exx * lam + eyy * chi
+  sxy = exy * miu
+end subroutine
+
+subroutine stress2strain(sxx,syy,sxy,rho,cp,cs,exx,eyy,exy)
+  implicit none
+  real(kind=RKIND),intent(in) :: sxx,syy,sxy,rho,cp,cs
+  real(kind=RKIND),intent(out) :: exx,eyy,exy
+  real(kind=rkind) :: miu,lam,chi,a,b
+  miu = rho*cs**2
+  chi = rho*cp**2
+  lam = chi-2d0*miu
+  a = (chi+lam)/(chi**2+lam*chi-2.0*lam**2)
+  b = (-lam   )/(chi**2+lam*chi-2.0*lam**2)
+  a =  chi/(chi**2-lam**2)
+  b = -lam/(chi**2-lam**2)
+
+  exx = sxx * a + syy * b
+  eyy = sxx * b + syy * a
+  exy = sxy / miu
+end subroutine
+
+
 end module

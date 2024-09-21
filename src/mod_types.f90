@@ -26,6 +26,7 @@ type :: meshvar
     integer :: nrecv
     integer :: body_nrecv
     real(kind=rkind) :: dtfactor
+    real(kind=rkind) :: deltaT
     real(kind=rkind) :: current_time
     real(kind=rkind) :: max_grid
     real(kind=rkind) :: min_grid

@@ -56,12 +56,16 @@ for iproc = 0:nproc-1
                     x = node(1,elem(j,ie));
                     y = node(2,elem(j,ie));
 
+                    mu_s1 = 0.76;
+                    % tpv11
+                    mu_s1 = 0.57;
+
                     d = sqrt(x^2+y^2);
                     d = max(d,1e-3);
                     sigma = -7378*d;
                     tau = 0.55*sigma;
                     if (abs(d-12e3)<1.5e3)
-                        tau = -0.2e6+(0.76+0.0057)*sigma;
+                        tau = -0.2e6+(mu_s1+0.0057)*sigma;
                     end
 
                     X(i,is,ief) = x;
@@ -69,7 +73,7 @@ for iproc = 0:nproc-1
                     sigma0(i,is,ief) = sigma;
                     tau0(i,is,ief) = tau;
 
-                    mu_s(i,is,ief) = 0.76;
+                    mu_s(i,is,ief) = mu_s1;
                     mu_d(i,is,ief) = 0.448;
                     Dc(i,is,ief) = 0.5;
                     C0(i,is,ief) = 0.2e6;

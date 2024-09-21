@@ -53,12 +53,12 @@ for iproc = 0:nproc-1
                         sxy = 81.6e6;
                     end
 
-                    if (abs(x-7.5e3)<1.5e3)
-                        sxy = 60e6;
-                    end
-                    if (abs(x+7.5e3)<1.5e3)
-                        sxy = 80e6;
-                    end
+                    %if (abs(x-7.5e3)<1.5e3)
+                    %    sxy = 60e6;
+                    %end
+                    %if (abs(x+7.5e3)<1.5e3)
+                    %    sxy = 80e6;
+                    %end
 
 
                     X(i,is,ief) = x;

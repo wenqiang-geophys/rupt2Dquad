@@ -12,13 +12,15 @@ nproc = par.nproc;
 data_dir = par.data_dir;
 
 fnm = 'tpv5_2d.exo';
-fnm = 'tpv5_2d_symm.exo';
+fnm = 'tpv5_2d_circ.exo';
+%fnm = 'tpv5_2d_symm.exo';
 coord = ncread(fnm,'coord');
 node = coord(:,1:2);
 Nnode = size(node,1);
 
 quad_list = [6];
-quad_list = [10];
+quad_list = [3];
+%quad_list = [10];
 elem = [];
 for i = 1:length(quad_list)
     elem1 = ncread(fnm,['connect',num2str(quad_list(i))]);

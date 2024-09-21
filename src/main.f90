@@ -25,6 +25,7 @@ use mod_io_inter_s
 use mod_io_inter_f
 use mod_io_wave
 use mod_read
+use mod_plastic
 
 implicit none
 
@@ -224,6 +225,7 @@ dt = CFL*hmin/Nsub/(2*order+1)/vpmax
 dt = CFL*hmin/Ngrid/2.0/vpmax
 #endif
 mesh%dtfactor = dt
+mesh%deltaT = dt
 !#ifdef FD
 !    dt = 0.2*hmin/order/2.0/maxval(mesh%vp)
 !#endif
@@ -486,6 +488,8 @@ do it = 1,nt
 
     end do ! irk
 
+    if(plasticity==1) &
+    call update_plastic(mesh,wave%u)
     !do i = 1,5
     !    wave%u(:,:,i) = wave%u(:,:,i) * reshape(mesh%damp,(/Np,mesh%Nelem/))
     !end do

@@ -17,6 +17,7 @@ data_dir : data
 
 # local stress: sigma0, tau0
 input_stress_type : 1
+plasticity: 1
 
 # snapshot output: skip every N steps
 fault_snap_skip   : 10
