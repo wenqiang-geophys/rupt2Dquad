@@ -6,9 +6,9 @@ par = ReadYaml('parameters.yaml');
 nproc = par.nproc;
 data_dir = par.data_dir;
 
+varnm = 'rate';
 %varnm = 'stress';
-varnm = 'sigma';
-fault_segment_id = 1;
+%varnm = 'sigma';
 
 x = []; y = []; v = [];
 fault_id = [];

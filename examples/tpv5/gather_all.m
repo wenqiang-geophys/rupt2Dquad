@@ -29,8 +29,8 @@ for iproc = 0:nproc-1
     end
 end
 
-Vx = [];Vy = [];
-rate = [];stress=[];
+Vx = []; Vy = [];
+rate = []; tau = []; sigma = [];
 xf = []; yf = [];
 for iproc = 0:nproc-1
     fnm = sprintf('%s/wave_mpi%06d.nc',data_dir,iproc);
@@ -43,7 +43,8 @@ for iproc = 0:nproc-1
     if (exist(fnm,'file'))
         tf = ncread(fnm, 'time');
         v1 = ncread(fnm, 'rate'); rate = cat(2,rate,v1);
-        v1 = ncread(fnm, 'tau'); stress = cat(2,stress,v1);
+        v1 = ncread(fnm, 'tau'); tau = cat(2,tau,v1);
+        v1 = ncread(fnm, 'sigma'); sigma = cat(2,sigma,v1);
         v1 = ncread(fnm, 'x'); xf = cat(2,xf,v1);
         v1 = ncread(fnm, 'y'); yf = cat(2,yf,v1);
     end
@@ -57,9 +58,9 @@ ncid = netcdf.create(fnm,'netcdf4');%'CLOBBER'
 waveGrpId = netcdf.defGrp(ncid,"wave");
 faultGrpId = netcdf.defGrp(ncid,"fault");
 
-dimid2 = netcdf.defDim(ncid,'two',2);
+%dimid2 = netcdf.defDim(ncid,'two',2);
 dimid3 = netcdf.defDim(ncid,'three',3);
-dimid4 = netcdf.defDim(ncid,'four',4);
+%dimid4 = netcdf.defDim(ncid,'four',4);
 dimid_N = netcdf.defDim(ncid,'Nfp',NGLL);
 
 dimid_elem = netcdf.defDim(waveGrpId,'Nelem',Nelem);
@@ -81,7 +82,8 @@ varid7 = netcdf.defVar(faultGrpId,'x','NC_DOUBLE',[dimid_N,dimid_elem2]);
 varid8 = netcdf.defVar(faultGrpId,'y','NC_DOUBLE',[dimid_N,dimid_elem2]);
 varid9 = netcdf.defVar(faultGrpId,'t','NC_DOUBLE',[dimid_t2]);
 varid10 = netcdf.defVar(faultGrpId,'rate','NC_FLOAT',[dimid_N,dimid_elem2,dimid_t2]);
-varid11 = netcdf.defVar(faultGrpId,'stress','NC_FLOAT',[dimid_N,dimid_elem2,dimid_t2]);
+varid11 = netcdf.defVar(faultGrpId,'tau','NC_FLOAT',[dimid_N,dimid_elem2,dimid_t2]);
+varid12 = netcdf.defVar(faultGrpId,'sigma','NC_FLOAT',[dimid_N,dimid_elem2,dimid_t2]);
 netcdf.endDef(faultGrpId);
 
 netcdf.putVar(waveGrpId,varid1,x);
@@ -95,6 +97,7 @@ netcdf.putVar(faultGrpId,varid7,xf);
 netcdf.putVar(faultGrpId,varid8,yf);
 netcdf.putVar(faultGrpId,varid9,tf);
 netcdf.putVar(faultGrpId,varid10,rate);
-netcdf.putVar(faultGrpId,varid11,stress);
+netcdf.putVar(faultGrpId,varid11,tau);
+netcdf.putVar(faultGrpId,varid12,sigma);
 
 netcdf.close(ncid);

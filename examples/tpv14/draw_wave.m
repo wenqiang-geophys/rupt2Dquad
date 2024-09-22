@@ -19,7 +19,7 @@ for i = 1:nelem
 end
 
 figure
-for it = 1:11:nt
+for it = 1:1:nt
 
     [v1,t] = gather_wave_snap(data_dir, nproc, 'Vx', it);
     vmax = max(abs(v1(:)));

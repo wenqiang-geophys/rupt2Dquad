@@ -20,5 +20,6 @@ input_stress_type : 1
 plasticity: 0
 
 # snapshot output: skip every N steps
-fault_snap_skip   : 10
-wave_snap_skip : 10
+wave_snap_skip      : 20
+fault_snap_skip     : 2
+grdsurf_snap_skip   : 2

@@ -18,5 +18,6 @@ data_dir : data
 plasticity : 0
 
 # snapshot output: skip every N steps
-fault_snap_skip   : 10
-wave_snap_skip : 10
+wave_snap_skip : 50
+fault_snap_skip   : 2
+grdsurf_snap_skip : 2

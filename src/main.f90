@@ -63,8 +63,8 @@ real(kind=rkind) :: src_dist
 !integer :: wave_snap_skip
 
 use_pml = 0
-fault_snap_skip = 1
-wave_snap_skip = 1
+!fault_snap_skip = 1
+!wave_snap_skip = 1
 
 !call init_mpi()
 !call comm_rank(myrank)
@@ -195,20 +195,16 @@ if (Order == 2) then
 CFL = 2.0
 end if
 if (Order == 3) then
-CFL = 2.5
-CFL = 1.2
+CFL = 1.5
 end if
 if (Order == 4) then
-CFL = 1.3
-CFL = 0.5
-CFL = 1.0/1d0
-CFL = 1
+CFL = 1.2
 end if
 if (Order == 5) then
-CFL = 2. * 0.5
+CFL = 1.0
 end if
 if (Order == 6) then
-CFL = 1.
+CFL = 1.0
 end if
 if (order > 8) then
 CFL = 0.3
@@ -240,10 +236,13 @@ if (myrank==0) print*,'nt = ',nt
 !print*,'dt = ',dt
 tskip = int(0.5/dt)
 !tskip = 2
-tskip = fault_snap_skip
-if(myrank==0) print*,'tskip = ',tskip
+!tskip = fault_snap_skip
+if(myrank==0) &
+print*,'fault_snap_skip = ',fault_snap_skip, &
+'wave_snap_skip = ',wave_snap_skip, &
+'grdsurf_snap_skip = ',grdsurf_snap_skip
 
-wave_snap_skip = tskip
+!wave_snap_skip = tskip
 
 !do i = 1,mesh%nrecv
 !    write(filename,'(a,i6.6,a)') 'data/recv_id',mesh%recv_fid(i),'.txt'
@@ -379,6 +378,20 @@ do it = 1,nt
     mesh%current_time = mesh%current_timestep * dt
     t = it*dt
 
+    if (mod(it-1,fault_snap_skip) == 0) then
+        call inter_s_io_save(mesh,wave%u,(it-1)/fault_snap_skip+1)
+        call inter_f_io_save(mesh,wave%u,(it-1)/fault_snap_skip+1)
+    end if
+    if (mod(it-1,fault_snap_skip) == 0) then
+        call free_io_save(mesh,wave%u,(it-1)/fault_snap_skip+1)
+    end if
+    if (mod(it-1,fault_snap_skip) == 0) then
+        call fault_io_save(mesh,(it-1)/fault_snap_skip+1)
+    end if
+    if (mod(it-1,wave_snap_skip) == 0) then
+        if(myrank==0) print*,'writing data/wave_mpi @ ',it,'/',nt
+        call wave_io_save(mesh,wave%u,(it-1)/wave_snap_skip+1)
+    end if
     ! add source
     !!!rise_time = 0.1
     !!!if (t< rise_time) then
@@ -593,20 +606,6 @@ do it = 1,nt
     !end if
 
 
-    if (mod(it-1,fault_snap_skip) == 0) then
-        call inter_s_io_save(mesh,wave%u,(it-1)/fault_snap_skip+1)
-        call inter_f_io_save(mesh,wave%u,(it-1)/fault_snap_skip+1)
-    end if
-    if (mod(it-1,fault_snap_skip) == 0) then
-        call free_io_save(mesh,wave%u,(it-1)/fault_snap_skip+1)
-    end if
-    if (mod(it-1,fault_snap_skip) == 0) then
-        call fault_io_save(mesh,(it-1)/fault_snap_skip+1)
-    end if
-    if (mod(it-1,wave_snap_skip) == 0) then
-        if(myrank==0) print*,'writing data/wave_mpi @ ',it,'/',nt
-        call wave_io_save(mesh,wave%u,(it-1)/wave_snap_skip+1)
-    end if
 enddo ! it
 
 call inter_s_io_end(mesh)

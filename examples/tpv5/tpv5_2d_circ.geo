@@ -1,6 +1,6 @@
 //+
 SetFactory("OpenCASCADE");
-faultsize = 500;
+faultsize = 150;
 boundsize = 10e3;
 Point(1) = {-15e3, 0, 0, 1.0};
 Point(2) = {+15e3, 0, 0, 1.0};
