@@ -88,6 +88,7 @@ logical :: masternode
 logical :: nice_print
 
 real(kind=RKIND) :: simu_time_max
+real(kind=RKIND) :: default_cfl_number
 real(kind=RKIND) :: cfl_number
 real(kind=RKIND) :: timestep
 

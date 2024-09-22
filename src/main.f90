@@ -26,6 +26,7 @@ use mod_io_inter_f
 use mod_io_wave
 use mod_read
 use mod_plastic
+use mod_funcs
 
 implicit none
 
@@ -92,6 +93,8 @@ mesh%rank = myrank
 !call gll_nodes(p1,x1,wts1)
 !call gll_nodes(p2,x2,wts2)
 !call lagint(x1,x2,G,D)
+
+default_cfl_number = set_default_CFL(pOrder)
 
 call read_parameters()
 
@@ -190,31 +193,9 @@ if (myrank==0) print*,'vs = ',  sngl(vsmin ),'~',sngl(vsmax )
 !dt = 0.5*hmin/(2*order+1)/vpmax
 !dt = 0.5*hmin*minGLL/vpmax
 
-CFL = 0.8 ! O=4,Nsub=4
-if (Order == 2) then
-CFL = 2.0
-end if
-if (Order == 3) then
-CFL = 1.5
-end if
-if (Order == 4) then
-CFL = 1.2
-end if
-if (Order == 5) then
-CFL = 1.0
-end if
-if (Order == 6) then
-CFL = 1.0
-end if
-if (order > 8) then
-CFL = 0.3
-end if
-
-damp_s = 0.0
-CFL = CFL / sqrt(1.0+2*damp_s)
-
-if(myrank==0) print*,'Order=',Order
-if(myrank==0) print*,'CFL=',sngl(CFL)
+damp_s = 0
+CFL = cfl_number / sqrt(1.0+2*damp_s)
+if(myrank==0) print*,'pOrder=',Order,'CFL=',sngl(CFL)
 
 dt = CFL*hmin/Nsub/(2*order+1)/vpmax
 #ifdef FD

@@ -726,5 +726,31 @@ subroutine stress2strain(sxx,syy,sxy,rho,cp,cs,exx,eyy,exy)
   exy = sxy / miu
 end subroutine
 
+function set_default_CFL(Order) result (cfl)
+implicit none
+integer :: Order
+real(kind=RKIND) :: cfl
+
+CFL = 0.8 ! O=4,Nsub=4
+if (Order == 2) then
+CFL = 2.0
+end if
+if (Order == 3) then
+CFL = 1.5
+end if
+if (Order == 4) then
+CFL = 1.2
+end if
+if (Order == 5) then
+CFL = 1.0
+end if
+if (Order == 6) then
+CFL = 1.0
+end if
+if (order > 8) then
+CFL = 0.3
+end if
+
+end function
 
 end module
