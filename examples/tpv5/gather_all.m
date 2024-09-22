@@ -30,7 +30,7 @@ for iproc = 0:nproc-1
 end
 
 Vx = []; Vy = [];
-rate = []; tau = []; sigma = [];
+rate = []; slip = []; tau = []; sigma = [];
 xf = []; yf = [];
 for iproc = 0:nproc-1
     fnm = sprintf('%s/wave_mpi%06d.nc',data_dir,iproc);
@@ -43,6 +43,7 @@ for iproc = 0:nproc-1
     if (exist(fnm,'file'))
         tf = ncread(fnm, 'time');
         v1 = ncread(fnm, 'rate'); rate = cat(2,rate,v1);
+        v1 = ncread(fnm, 'slip'); slip = cat(2,slip,v1);
         v1 = ncread(fnm, 'tau'); tau = cat(2,tau,v1);
         v1 = ncread(fnm, 'sigma'); sigma = cat(2,sigma,v1);
         v1 = ncread(fnm, 'x'); xf = cat(2,xf,v1);
@@ -82,8 +83,9 @@ varid7 = netcdf.defVar(faultGrpId,'x','NC_DOUBLE',[dimid_N,dimid_elem2]);
 varid8 = netcdf.defVar(faultGrpId,'y','NC_DOUBLE',[dimid_N,dimid_elem2]);
 varid9 = netcdf.defVar(faultGrpId,'t','NC_DOUBLE',[dimid_t2]);
 varid10 = netcdf.defVar(faultGrpId,'rate','NC_FLOAT',[dimid_N,dimid_elem2,dimid_t2]);
-varid11 = netcdf.defVar(faultGrpId,'tau','NC_FLOAT',[dimid_N,dimid_elem2,dimid_t2]);
-varid12 = netcdf.defVar(faultGrpId,'sigma','NC_FLOAT',[dimid_N,dimid_elem2,dimid_t2]);
+varid11 = netcdf.defVar(faultGrpId,'slip','NC_FLOAT',[dimid_N,dimid_elem2,dimid_t2]);
+varid12 = netcdf.defVar(faultGrpId,'tau','NC_FLOAT',[dimid_N,dimid_elem2,dimid_t2]);
+varid13 = netcdf.defVar(faultGrpId,'sigma','NC_FLOAT',[dimid_N,dimid_elem2,dimid_t2]);
 netcdf.endDef(faultGrpId);
 
 netcdf.putVar(waveGrpId,varid1,x);
@@ -97,7 +99,8 @@ netcdf.putVar(faultGrpId,varid7,xf);
 netcdf.putVar(faultGrpId,varid8,yf);
 netcdf.putVar(faultGrpId,varid9,tf);
 netcdf.putVar(faultGrpId,varid10,rate);
-netcdf.putVar(faultGrpId,varid11,tau);
-netcdf.putVar(faultGrpId,varid12,sigma);
+netcdf.putVar(faultGrpId,varid11,slip);
+netcdf.putVar(faultGrpId,varid12,tau);
+netcdf.putVar(faultGrpId,varid13,sigma);
 
 netcdf.close(ncid);

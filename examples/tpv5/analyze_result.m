@@ -12,6 +12,7 @@ t = ncread(fnm, '/wave/t');
 
 t1 = 2;
 [~,it] = min(abs(t-t1));
+% Vx or Vy
 v = squeeze(ncread(fnm, '/wave/Vx', [1,1,1,it], [Inf,Inf,Inf,1]));
 
 figure
@@ -29,6 +30,7 @@ nt = length(t);
 x = x(:);
 [x,idx] = sort(x);
 
+% rate, slip, tau, sigma
 v = ncread(fnm, '/fault/rate');
 v = reshape(v,[],nt);
 v = v(idx,:);
@@ -46,7 +48,7 @@ xlabel('Time (sec)')
 title(['at X = ',num2str(X1), ' m'])
 
 figure
-t1 = 2;
+t1 = 3;
 [~,it] = min(abs(t(:)-t1));
 plot(x,v(:,it),'LineWidth',1)
 xlabel('Time (sec)')
