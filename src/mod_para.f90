@@ -123,13 +123,14 @@ integer :: plasticity
 real(kind=rkind) :: cohesion
 real(kind=rkind) :: blkfric
 real(kind=rkind) :: Tvisc
-real(kind=rkind) :: coef_byy
-real(kind=rkind) :: coef_bxx
-real(kind=rkind) :: coef_bxy
-real(kind=rkind) :: fluidpres_profile_h1
-real(kind=rkind) :: fluidpres_profile_h2
-real(kind=rkind) :: fluidpres_profile_o1
-real(kind=rkind) :: fluidpres_profile_o2
+real(kind=rkind) :: SmaxAngle
+!real(kind=rkind) :: coef_byy
+!real(kind=rkind) :: coef_bxx
+!real(kind=rkind) :: coef_bxy
+!real(kind=rkind) :: fluidpres_profile_h1
+!real(kind=rkind) :: fluidpres_profile_h2
+!real(kind=rkind) :: fluidpres_profile_o1
+!real(kind=rkind) :: fluidpres_profile_o2
 
 ! thermal pressurization
 integer :: thermalpressure

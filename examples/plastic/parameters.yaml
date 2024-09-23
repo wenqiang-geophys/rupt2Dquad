@@ -12,6 +12,12 @@ mesh_dir : data
 # output dir
 data_dir : data
 
+plasticity : 1
+cohesion : 0
+blkfric : 0.8
+SmaxAngle : 45
+Tvisc : 0.03
+
 # snapshot output: skip every N steps
 wave_snap_skip : 50
 fault_snap_skip   : 2
