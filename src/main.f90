@@ -152,6 +152,9 @@ allocate(auy2% u(Np,mesh%nelem,8))
 allocate(auy2%hu(Np,mesh%nelem,8))
 allocate(auy2%mu(Np,mesh%nelem,8))
 allocate(auy2%tu(Np,mesh%nelem,8))
+allocate(wave%damage(Np,Np,mesh%nelem))
+
+wave%damage(:,:,:) = 0
 
 call init_wave(mesh,wave%u)
 call fault_init(mesh)
@@ -371,7 +374,7 @@ do it = 1,nt
     end if
     if (mod(it-1,wave_snap_skip) == 0) then
         if(myrank==0) print*,'writing data/wave_mpi @ ',it,'/',nt
-        call wave_io_save(mesh,wave%u,(it-1)/wave_snap_skip+1)
+        call wave_io_save(mesh,wave,(it-1)/wave_snap_skip+1)
     end if
     ! add source
     !!!rise_time = 0.1
@@ -483,7 +486,7 @@ do it = 1,nt
     end do ! irk
 
     if(plasticity==1) &
-    call update_plastic(mesh,wave%u)
+    call update_plastic(mesh,wave)
     !do i = 1,5
     !    wave%u(:,:,i) = wave%u(:,:,i) * reshape(mesh%damp,(/Np,mesh%Nelem/))
     !end do

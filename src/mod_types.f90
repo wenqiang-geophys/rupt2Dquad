@@ -170,6 +170,7 @@ end type
 
 type wavevar
     real(kind=rkind),dimension(:,:,:),pointer :: u,hu,mu,tu
+    real(kind=rkind),dimension(:,:,:),pointer :: damage
 end type
 
 contains

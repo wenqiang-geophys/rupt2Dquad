@@ -11,7 +11,7 @@ module mod_io_wave
   integer :: wave_varid(20)
 
   !real(kind=rkind),allocatable,dimension(:,:) :: x,y
-  real(kind=rkind),allocatable,dimension(:,:,:) :: Vx,Vy
+  real(kind=rkind),allocatable,dimension(:,:,:) :: Vx,Vy,eta
 
 contains
 
@@ -34,6 +34,7 @@ subroutine wave_io_init(mesh)
   allocate( y(Ngrid,Ngrid,mesh%nelem))
   allocate(Vx(Ngrid,Ngrid,mesh%nelem))
   allocate(Vy(Ngrid,Ngrid,mesh%nelem))
+  allocate(eta(Ngrid,Ngrid,mesh%nelem))
   do ie = 1,mesh%nelem
     do i = 1,Ngrid
       do j = 1,Ngrid
@@ -71,6 +72,9 @@ subroutine wave_io_init(mesh)
   ierr = nf90_def_var(wave_ncid, "Vy", NF90_FLOAT, dimid(1:4), wave_varid(2))
   call check2(ierr,'def_var Vy')
 
+  ierr = nf90_def_var(wave_ncid, "damage", NF90_FLOAT, dimid(1:4), wave_varid(5))
+  call check2(ierr,'def_var eta')
+
   ! end of define
   ierr = nf90_enddef(wave_ncid)
   call check2(ierr,'enddef')
@@ -86,17 +90,19 @@ subroutine wave_io_init(mesh)
   !deallocate(vars)
 end subroutine
 
-subroutine wave_io_save(mesh,u,it)
+subroutine wave_io_save(mesh,wave,it)
   implicit none
   type(meshvar) :: mesh
-  real(kind=rkind) :: u(:,:,:)
+  type(wavevar) :: wave
+  !real(kind=rkind) :: u(:,:,:)
   integer :: i, j, ie, is, it, ierr
   integer,dimension(4) :: start,cnt,stride
   do ie = 1,mesh%nelem
     do j = 1,Ngrid
       do i = 1,Ngrid
-        Vx(i,j,ie) = sngl( u(i+(j-1)*Ngrid,ie,1)/mesh%rho(ie) )
-        Vy(i,j,ie) = sngl( u(i+(j-1)*Ngrid,ie,2)/mesh%rho(ie) )
+        Vx(i,j,ie) = sngl( wave%u(i+(j-1)*Ngrid,ie,1)/mesh%rho(ie) )
+        Vy(i,j,ie) = sngl( wave%u(i+(j-1)*Ngrid,ie,2)/mesh%rho(ie) )
+        eta(i,j,ie) = sngl( wave%damage(i,j,ie) )
       enddo
     enddo
   enddo
@@ -106,6 +112,8 @@ subroutine wave_io_save(mesh,u,it)
   call check2(ierr,'put_var Vx')
   ierr = nf90_put_var(wave_ncid,wave_varid(2),Vy,start,cnt,stride)
   call check2(ierr,'put_var Vy')
+  ierr = nf90_put_var(wave_ncid,wave_varid(5),eta,start,cnt,stride)
+  call check2(ierr,'put_var eta')
 
   ierr = nf90_put_var(wave_ncid,wave_varid(4), &
       (/mesh%current_time/),(/it/),(/1/),(/1/))

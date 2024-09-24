@@ -6,6 +6,8 @@ addpath(genpath('../../mscripts'))
 par = ReadYaml('parameters.yaml');
 nproc = par.nproc;
 data_dir = par.data_dir;
+varnm = 'damage';
+varnm = 'Vx';
 
 [x,y,tvec] = gather_wave_coord(data_dir, nproc);
 nt = length(tvec);
@@ -19,13 +21,18 @@ for i = 1:nelem
 end
 
 figure
-for it = 1:1:nt
+for it = 20%1:1:nt
 
-    [v1,t] = gather_wave_snap(data_dir, nproc, 'Vx', it);
+    [v1,t] = gather_wave_snap(data_dir, nproc, varnm, it);
+
+    if strcmp(varnm, 'damage')
+        v1(v1==0)=1e-16;
+        v1 = log10(v1);
+    end
     vmax = max(abs(v1(:)));
     disp(['it = ',num2str(it),' vmax = ',num2str(vmax)]);
     plotSolutionFast(tri,x*1e-3,y*1e-3,v1 )
-    colormap rdbu
+    %colormap rdbu
 
     %hold off
     xlabel('X (km)')
@@ -34,10 +41,13 @@ for it = 1:1:nt
     %vmax = 60;
     %vmax=1;
     vmax = max(vmax,1e-16);
-    caxis([-1 1]*vmax/2)
+    %caxis([-1 1]*vmax/2)
     title(['T = ',num2str(t),' sec'])
 
-    %axis([-2 2 -1 1]*10)
+    axis([-30 30 -10 10])
+    if strcmp(varnm, 'damage')
+        caxis([-8 -5])
+    end
     hold on
     %plot3([-15 15],[0 0],[1 1]*1e30,'k','LineWidth',1.5)
 
