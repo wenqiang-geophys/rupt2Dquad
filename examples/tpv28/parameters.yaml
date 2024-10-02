@@ -18,7 +18,7 @@ fault_snap_skip     : 2
 grdsurf_snap_skip   : 2
 
 # Forced rupture when t < t0, r < rcrit
-ForcedRup : 1
+ForcedRup : 0
 ForcedRup_x0 : 0
 ForcedRup_y0 : 0
 ForcedRup_rcrit : 4.0e3
