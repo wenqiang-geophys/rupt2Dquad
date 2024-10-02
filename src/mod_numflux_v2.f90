@@ -249,12 +249,25 @@ subroutine get_flux(mesh,u,du,uax,uay,i,is,ie,qi,fstar)
         mu_d     = mesh%mu_d    (i,is,ief)
         Dc       = mesh%Dc      (i,is,ief)
         C0       = mesh%C0      (i,is,ief)
+        if (is == 1) then
+            x = mesh%vx(i,1,ie)
+            y = mesh%vy(i,1,ie)
+        else if (is == 2) then
+            x = mesh%vx(Ngrid,i,ie)
+            y = mesh%vy(Ngrid,i,ie)
+        else if (is == 3) then
+            x = mesh%vx(i,Ngrid,ie)
+            y = mesh%vy(i,Ngrid,ie)
+        else if (is == 4) then
+            x = mesh%vx(1,i,ie)
+            y = mesh%vy(1,i,ie)
+        end if
         call SlipWeakeningFriction( &
                 vn_p, vn_m, Tn_p, Tn_m, zp_p, zp_m,     &
                 vn_hat_p, vn_hat_m, Tn_hat_p, Tn_hat_m, &
                 vm_p, vm_m, Tm_p, Tm_m, zs_p, zs_m,     &
                 vm_hat_p, vm_hat_m, Tm_hat_p, Tm_hat_m, &
-                Tau_n, tau_0, Slip, vv, Dc, mu_s, mu_d)
+                Tau_n, tau_0, Slip, vv, Dc, mu_s, mu_d, x, y, mesh%current_time)
         mesh%sliprate(i,is,ief) = abs(vv)
         mesh%tau(i,is,ief) = Tm_hat_m+Tau_0
         mesh%sigma(i,is,ief) = Tn_hat_m+Tau_n

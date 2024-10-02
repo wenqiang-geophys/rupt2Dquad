@@ -50,7 +50,7 @@ for iproc = 0:nproc-1
                     syy = -120e6;
                     sxy = 70e6;
                     if (abs(x)<1.5e3)
-                        sxy = 81.6e6;
+                        %sxy = 81.6e6;
                     end
 
                     %if (abs(x-7.5e3)<1.5e3)

@@ -161,11 +161,12 @@ real(kind=rkind) :: src_mxy
 real(kind=rkind) :: src_m0
 
 ! parameters for time weakening law
-real(kind=rkind) :: nucleate_y0
-real(kind=rkind) :: nucleate_z0
-real(kind=rkind) :: nucleate_rcrit
-real(kind=rkind) :: nucleate_Vrup
-real(kind=rkind) :: TimeForcedRup
+integer :: ForcedRup
+real(kind=rkind) :: ForcedRup_x0
+real(kind=rkind) :: ForcedRup_y0
+real(kind=rkind) :: ForcedRup_rcrit
+real(kind=rkind) :: ForcedRup_Vr
+real(kind=rkind) :: ForcedRup_t0
 
 contains
 
