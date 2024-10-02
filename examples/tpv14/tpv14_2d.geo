@@ -1,7 +1,7 @@
 // Gmsh project created on Wed Sep 22 12:42:09 2021
 
 SetFactory("OpenCASCADE");
-faultsize = 500;
+faultsize = 200;
 boundsize = 5e3;
 Point(1) = {0, 0, 0, 1.0};
 Point(2) = {12e3, 0, 0, 1.0};

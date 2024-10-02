@@ -14,11 +14,20 @@ data_dir : data
 
 plasticity : 1
 cohesion : 0
-blkfric : 0.8
+blkfric : 0.85
 SmaxAngle : 45
-Tvisc : 0.03
+Tvisc : 0.05
 
 # snapshot output: skip every N steps
 wave_snap_skip : 50
 fault_snap_skip   : 2
 grdsurf_snap_skip : 2
+
+
+# Forced rupture when t < t0, r < rcrit
+ForcedRup : 0
+ForcedRup_x0 : -10.0e3
+ForcedRup_y0 : 0
+ForcedRup_rcrit : 4.0e3
+ForcedRup_Vr : 2.0e3
+ForcedRup_t0 : 0.5

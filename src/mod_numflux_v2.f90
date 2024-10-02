@@ -267,7 +267,8 @@ subroutine get_flux(mesh,u,du,uax,uay,i,is,ie,qi,fstar)
                 vn_hat_p, vn_hat_m, Tn_hat_p, Tn_hat_m, &
                 vm_p, vm_m, Tm_p, Tm_m, zs_p, zs_m,     &
                 vm_hat_p, vm_hat_m, Tm_hat_p, Tm_hat_m, &
-                Tau_n, tau_0, Slip, vv, Dc, mu_s, mu_d, x, y, mesh%current_time)
+                Tau_n, tau_0, Slip, vv, Dc, mu_s, mu_d, &
+                C0, x, y, mesh%current_time)
         mesh%sliprate(i,is,ief) = abs(vv)
         mesh%tau(i,is,ief) = Tm_hat_m+Tau_0
         mesh%sigma(i,is,ief) = Tn_hat_m+Tau_n

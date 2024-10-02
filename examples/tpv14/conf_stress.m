@@ -9,6 +9,7 @@ par = ReadYaml('parameters.yaml');
 nproc = par.nproc;
 mesh_dir = par.mesh_dir;
 %data_dir = par.data_dir;
+ForcedRup = par.ForcedRup;
 
 for iproc = 0:nproc-1
 
@@ -57,8 +58,10 @@ for iproc = 0:nproc-1
 
                     sigma = -120e6;
                     tau = -70e6;
+                    if (ForcedRup == 0)
                     if (abs(x+8e3)<1.5e3)
                         tau = -81.6e6;
+                    end
                     end
 
                     %if (vec_n(2)<0)

@@ -1,9 +1,9 @@
 //+
 SetFactory("OpenCASCADE");
-faultsize = 300;
+faultsize = 200;
 boundsize = 10e3;
-Point(1) = {-15e3, 0, 0, 1.0};
-Point(2) = {+15e3, 0, 0, 1.0};
+Point(1) = {-25e3, 0, 0, 1.0};
+Point(2) = {+25e3, 0, 0, 1.0};
 Line(1) = {1, 2};
 Circle(4) = {0, 0, 0, 100e3, 0, 2*Pi};
 Curve Loop(1) = {4};

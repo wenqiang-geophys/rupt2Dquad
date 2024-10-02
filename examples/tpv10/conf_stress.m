@@ -8,6 +8,7 @@ myconstants;
 par = ReadYaml('parameters.yaml');
 nproc = par.nproc;
 mesh_dir = par.mesh_dir;
+ForcedRup = par.ForcedRup;
 
 for iproc = 0:nproc-1
 
@@ -56,6 +57,16 @@ for iproc = 0:nproc-1
                     x = node(1,elem(j,ie));
                     y = node(2,elem(j,ie));
 
+                    C01 = 0.2e6;
+
+                    % % depth dependent cohesive force
+                    %dep = -y;
+                    %if (dep < 4e3)
+                    %    C01 = (1-dep/4e3)*5e6;
+                    %else
+                    %    C01 = 0;
+                    %end
+
                     mu_s1 = 0.76;
                     % tpv11
                     % mu_s1 = 0.57;
@@ -64,8 +75,10 @@ for iproc = 0:nproc-1
                     d = max(d,1e-3);
                     sigma = -7378*d;
                     tau = 0.55*sigma;
+                    if (ForcedRup == 0)
                     if (abs(d-12e3)<1.5e3)
-                        tau = -0.2e6+(mu_s1+0.0057)*sigma;
+                        tau = -C01+(mu_s1+0.0057)*sigma;
+                    end
                     end
 
                     X(i,is,ief) = x;
@@ -76,7 +89,7 @@ for iproc = 0:nproc-1
                     mu_s(i,is,ief) = mu_s1;
                     mu_d(i,is,ief) = 0.448;
                     Dc(i,is,ief) = 0.5;
-                    C0(i,is,ief) = 0.2e6;
+                    C0(i,is,ief) = C01;
                 end
 
             end

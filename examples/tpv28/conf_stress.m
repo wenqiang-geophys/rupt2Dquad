@@ -8,6 +8,7 @@ myconstants;
 par = ReadYaml('parameters.yaml');
 nproc = par.nproc;
 mesh_dir = par.mesh_dir;
+ForcedRup = par.ForcedRup;
 
 for iproc = 0:nproc-1
 
@@ -49,8 +50,10 @@ for iproc = 0:nproc-1
                     sxx = -60e6;
                     syy = -60e6;
                     sxy = 29.38e6;
+                    if (ForcedRup == 0)
                     if (abs(x)<1.5e3)
                         sxy = -(0.677+0.01)*syy;
+                    end
                     end
 
                     X(i,is,ief) = x;

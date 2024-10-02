@@ -7,7 +7,7 @@ par = ReadYaml('parameters.yaml');
 nproc = par.nproc;
 data_dir = par.data_dir;
 varnm = 'damage';
-varnm = 'Vx';
+%varnm = 'Vx';
 
 [x,y,tvec] = gather_wave_coord(data_dir, nproc);
 nt = length(tvec);
@@ -21,7 +21,7 @@ for i = 1:nelem
 end
 
 figure
-for it = 20%1:1:nt
+for it = 1:1:nt
 
     [v1,t] = gather_wave_snap(data_dir, nproc, varnm, it);
 

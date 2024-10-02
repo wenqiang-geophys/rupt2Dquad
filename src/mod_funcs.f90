@@ -536,11 +536,11 @@ subroutine SlipWeakeningFriction(vn_p, vn_m, Tn_p, Tn_m, zn_p, zn_m, &
                                  vn_hat_p, vn_hat_m, Tn_hat_p, Tn_hat_m, &
                                  vm_p,vm_m, Tm_p, Tm_m, zm_p , zm_m, &
                                  vm_hat_p, vm_hat_m, Tm_hat_p, Tm_hat_m, &
-                                 T0_n, T0_m, S, Vel, Dc, mu_s, mu_d, x, y, t)
+                                 T0_n, T0_m, S, Vel, Dc, mu_s, mu_d, C0, x, y, t)
     implicit none
     real(kind=rkind),intent(in) :: vn_p, vn_m, Tn_p, Tn_m, zn_p, zn_m
     real(kind=rkind),intent(in) :: vm_p,vm_m, Tm_p, Tm_m, zm_p , zm_m
-    real(kind=rkind),intent(in) :: T0_n, T0_m, S, Dc, mu_s, mu_d
+    real(kind=rkind),intent(in) :: T0_n, T0_m, S, Dc, mu_s, mu_d, C0
     real(kind=rkind),intent(in) :: x, y, t
     real(kind=rkind),intent(out) :: vn_hat_p,vn_hat_m,Tn_hat_p,Tn_hat_m
     real(kind=rkind),intent(out) :: vm_hat_p,vm_hat_m,Tm_hat_p,Tm_hat_m
@@ -579,7 +579,7 @@ subroutine SlipWeakeningFriction(vn_p, vn_m, Tn_p, Tn_m, zn_p, zn_m, &
     tau_lock = dsqrt((T0_m + phi_m)**2)
     sigma_n = max(0.0, -(T0_n + phi_n))   ! including prestress
 
-    call TauStrength(tau_str, sigma_n, S, Dc, mu_s, mu_d, x, y, t)
+    call TauStrength(tau_str, sigma_n, S, Dc, mu_s, mu_d, C0, x, y, t)
 
     !Vel = 0
     if (tau_lock >= tau_str) then
@@ -613,9 +613,9 @@ subroutine slip_weakening(v1,Vel,tau1,phi_1,eta,tau_str,sigma_n)
     tau1 = phi_1 - eta*v1
 end subroutine
 
-subroutine TauStrength(tau_str, sigma_n, S, S_c, mu_s, mu_d, x, y, cur_time)
+subroutine TauStrength(tau_str, sigma_n, S, S_c, mu_s, mu_d, C0, x, y, cur_time)
     implicit none
-    real(kind=rkind),intent(in) :: sigma_n,S,S_c,mu_s,mu_d
+    real(kind=rkind),intent(in) :: sigma_n,S,S_c,mu_s,mu_d, C0
     real(kind=rkind),intent(out) :: tau_str
     real(kind=rkind) :: fric_coeff
     real(kind=rkind),intent(in) :: x,y,cur_time
@@ -629,7 +629,7 @@ subroutine TauStrength(tau_str, sigma_n, S, S_c, mu_s, mu_d, x, y, cur_time)
     if (ForcedRup==1) then
     call time_weakening(x,y,ForcedRup_x0,ForcedRup_y0,ForcedRup_rcrit,ForcedRup_Vr,ForcedRup_t0,cur_time,S,S_c,mu_s,mu_d,fric_coeff)
     end if
-    tau_str = fric_coeff*sigma_n   
+    tau_str = fric_coeff*sigma_n+C0
 end subroutine
 
 subroutine time_weakening(x,y,x0,y0,rcrit,Vr,t0,cur_time,slip,Dc,mu_s,mu_d,mu_f)

@@ -1,5 +1,5 @@
 SetFactory("OpenCASCADE");
-faultsize = 500;
+faultsize = 200;
 boundsize = 5000;
 R = 75e3;
 FaultLen = 15e3;

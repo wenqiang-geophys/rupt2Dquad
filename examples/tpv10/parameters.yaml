@@ -19,3 +19,12 @@ input_stress_type : 1
 wave_snap_skip      : 20
 fault_snap_skip     : 2
 grdsurf_snap_skip   : 2
+
+# Forced rupture when t < t0, r < rcrit
+# set ForcedRup as 1 to turn on the Forced rupture
+ForcedRup : 0
+ForcedRup_x0 : 6.0e3
+ForcedRup_y0 : -10.392e3
+ForcedRup_rcrit : 3.0e3
+ForcedRup_Vr : 2.0e3
+ForcedRup_t0 : 0.5
