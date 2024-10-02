@@ -46,7 +46,7 @@ end
 
 figure
 %plot(x(:), y(:), 'x')
-pcolor(x,t, log10(v'))
+pcolor(x,t, (v'))
 shading interp
 %caxis([0 3])
 c=colorbar;
@@ -57,7 +57,8 @@ if strcmp(varnm, 'stress')
     caxis([63 81.24])
 end
 if strcmp(varnm, 'rate')
-    title(c,'log_{10} V [m/s]')
+    %title(c,'log_{10} V [m/s]')
+    title(c,'V [m/s]')
     %ylabel(c,'slip rate')
     %caxis([0 3])
 end
