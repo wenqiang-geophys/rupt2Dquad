@@ -34,7 +34,9 @@ for it = 1:1:nt
 
     axis([-20 30 -30 0])
     hold on
-    plot3([0 15*cosd(60)],[0 -15*sind(60)],[1 1]*1e30, 'k','LineWidth',1.5)
+    FaultDipAngle = 60;
+    FaultLen = 15;
+    plot3([0 FaultLen*cosd(FaultDipAngle)],[0 -FaultLen*sind(FaultDipAngle)],[1 1]*1e30, 'k','LineWidth',1.5)
     hold off
 
     pause(0.005)
