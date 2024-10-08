@@ -15,7 +15,7 @@ mesh_dir = par.mesh_dir;
 ForcedRup = par.ForcedRup;
 
 
-tau = []; xf = []; mu_1 = []; mu_2 = [];
+tau = []; sig = []; xf = []; mu_1 = []; mu_2 = [];
 
 for iproc = 0:nproc-1
 
@@ -96,6 +96,7 @@ for iproc = 0:nproc-1
                     C0(i,is,ief) = 0;
 
                     tau = [tau,sxy];
+                    sig = [sig,syy];
                     xf = [xf,x];
                     mu_1 = [mu_1,mu_s1];
                     mu_2 = [mu_2,mu_d1];
@@ -141,13 +142,18 @@ mu_2 = mu_2(idx);
 
 figure
 plot(xf,tau,'x-','LineWidth',1)
+hold on
+plot(xf,-sig,'o-','LineWidth',1)
 xlabel('X (m)')
-ylabel('shear stress (MPa)')
+legend('\tau','-\sigma','Location','best','FontSize',20)
+ylabel('Initial Stress (Pa)')
+%print -dpng -r150 stress
 
 figure
 plot(xf,mu_1,'x-','LineWidth',1)
 hold on
 plot(xf,mu_2,'o-','LineWidth',1)
 xlabel('X (m)')
-legend('\mu_s','\mu_d','Location','best')
+legend('\mu_s','\mu_d','Location','best','FontSize',20)
 ylabel('Friction')
+%print -dpng -r150 friction
