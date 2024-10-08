@@ -5,7 +5,7 @@
 # number of processors
 nproc : 4
 # simulation time length (in seconds)
-simu_time_max : 12.0
+simu_time_max : 16.0
 
 # mesh dir
 mesh_dir : data
@@ -23,5 +23,5 @@ ForcedRup : 1
 ForcedRup_x0 : 0
 ForcedRup_y0 : 0
 ForcedRup_rcrit : 4.0e3
-ForcedRup_Vr : 1.0e3
+ForcedRup_Vr : 2.0e3
 ForcedRup_t0 : 0.5

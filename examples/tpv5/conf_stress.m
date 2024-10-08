@@ -2,6 +2,10 @@
 clear
 %close all
 
+%%%%% Change this:
+tau_2 = 63e6;   % Pa
+%%%%%%%%%%%%%%%%%%%%%
+
 addpath(genpath('../../mscripts'));
 myconstants;
 
@@ -9,6 +13,9 @@ par = ReadYaml('parameters.yaml');
 nproc = par.nproc;
 mesh_dir = par.mesh_dir;
 ForcedRup = par.ForcedRup;
+
+
+tau = []; xf = []; mu_1 = []; mu_2 = [];
 
 for iproc = 0:nproc-1
 
@@ -63,6 +70,12 @@ for iproc = 0:nproc-1
                     %    sxy = 80e6;
                     %end
 
+                    if x > 10e3
+                        sxy = tau_2;
+                    end
+                    if x < 0e3
+                        sxy = tau_2;
+                    end
 
                     X(i,is,ief) = x;
 
@@ -70,15 +83,29 @@ for iproc = 0:nproc-1
                     Syy(i,is,ief) = syy;
                     Sxy(i,is,ief) = sxy;
 
-                    mu_s(i,is,ief) = 0.677;
-                    mu_d(i,is,ief) = 0.525;
-                    Dc(i,is,ief) = 0.4;
+                    mu_s1 = 0.677;
+                    mu_d1 = 0.525;
+
+                    if x < 0
+                        mu_s1 = mu_d1;
+                    end
+
+                    mu_s(i,is,ief) = mu_s1;   % static friction
+                    mu_d(i,is,ief) = mu_d1;   % dynamic friciton
+                    Dc(i,is,ief) = 0.4;       % slip-weakening distance
                     C0(i,is,ief) = 0;
+
+                    tau = [tau,sxy];
+                    xf = [xf,x];
+                    mu_1 = [mu_1,mu_s1];
+                    mu_2 = [mu_2,mu_d1];
                 end
 
             end
         end
     end
+
+    
 
 
     ncid = netcdf.open(fnm_out,'WRITE');
@@ -105,3 +132,22 @@ for iproc = 0:nproc-1
 
 
 end
+
+% check initial settings for stresses and frictions
+[xf,idx] = sort(xf);
+tau = tau(idx);
+mu_1 = mu_1(idx);
+mu_2 = mu_2(idx);
+
+figure
+plot(xf,tau,'x-','LineWidth',1)
+xlabel('X (m)')
+ylabel('shear stress (MPa)')
+
+figure
+plot(xf,mu_1,'x-','LineWidth',1)
+hold on
+plot(xf,mu_2,'o-','LineWidth',1)
+xlabel('X (m)')
+legend('\mu_s','\mu_d','Location','best')
+ylabel('Friction')

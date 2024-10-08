@@ -2,6 +2,8 @@ clc
 close all
 clear
 
+addpath(genpath('../../mscripts'))
+
 par = ReadYaml('parameters.yaml');
 nproc = par.nproc;
 data_dir = par.data_dir;
@@ -21,7 +23,7 @@ for i = 1:nproc
     t = ncread(fnm, 'time');
 
     nt = length(t);
-    %nt = 600;
+    %nt = 1400;
     t = t(1:nt);
     v1 = v1(:,:,1:nt);
 

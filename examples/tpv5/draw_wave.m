@@ -32,13 +32,14 @@ for it = 1:1:nt
     %ylabel('Depth (km)')
     ylabel('Y (km)')
     %vmax = 60;
-    vmax=1;
-    caxis([-1 1]*vmax/2)
+    %vmax=1;
+    vmax = max(vmax,1e-16);
+    caxis([-1 1]*vmax/5)
     title(['T = ',num2str(t),' sec'])
 
-    axis([-2 2 -1 1]*10)
+    %axis([-2 2 -1 1]*40)
     hold on
-    plot3([-15 15],[0 0],[1 1]*1e30,'k','LineWidth',1.5)
+    plot3([-1 1]*40,[0 0],[1 1]*1e30,'k','LineWidth',1.5)
 
     hold off
 
