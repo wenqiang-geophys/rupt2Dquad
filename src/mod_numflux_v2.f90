@@ -186,8 +186,9 @@ subroutine get_flux(mesh,u,du,uax,uay,i,is,ie,qi,fstar)
 
     ! penalty flux
     !if (mesh%bctype(is,ie) == BC_IN) then
-    if (.false.) then
-    if (mesh%bctype(is,ie) == BC_IN .and. &
+    !if (.false.) then
+    if (flux_method == 2 .and. &
+        mesh%bctype(is,ie) == BC_IN .and. &
         mesh%fluxtype(is,ie) == 1) then
     !if (mesh%bctype(is,ie) == BC_IN .and. &
     !    mesh%ispml(is,ie) == 1) then
@@ -233,7 +234,7 @@ subroutine get_flux(mesh,u,du,uax,uay,i,is,ie,qi,fstar)
 
         return
     end if
-    end if
+    !end if
 
     call rotate_xy2nm(vec_n,vec_m,vx_m,vy_m,vn_m,vm_m)
     call rotate_xy2nm(vec_n,vec_m,Tx_m,Ty_m,Tn_m,Tm_m)
