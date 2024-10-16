@@ -128,6 +128,7 @@ allocate(wave% u(Np,mesh%nelem,8))
 allocate(wave%hu(Np,mesh%nelem,8))
 allocate(wave%mu(Np,mesh%nelem,8))
 allocate(wave%tu(Np,mesh%nelem,8))
+if (use_pml==1) then
 allocate(aux% u(Np,mesh%nelem,8))
 allocate(aux%hu(Np,mesh%nelem,8))
 allocate(aux%mu(Np,mesh%nelem,8))
@@ -152,6 +153,7 @@ allocate(auy2% u(Np,mesh%nelem,8))
 allocate(auy2%hu(Np,mesh%nelem,8))
 allocate(auy2%mu(Np,mesh%nelem,8))
 allocate(auy2%tu(Np,mesh%nelem,8))
+end if
 allocate(wave%damage(Np,Np,mesh%nelem))
 
 wave%damage(:,:,:) = 0
@@ -319,6 +321,7 @@ mesh%current_time = 0d0
 wave%tu = 0
 wave%mu = 0
 wave%u = 0
+if (use_pml==1) then
 aux%u  = 0
 aux%hu = 0
 aux%mu = 0
@@ -335,6 +338,7 @@ auy2%u  = 0
 auy2%hu = 0
 auy2%mu = 0
 auy2%tu = 0
+endif
 ! init wave
 !if (.true.) then
 if (.false.) then

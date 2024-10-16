@@ -766,6 +766,7 @@ integer :: Order
 real(kind=RKIND) :: cfl
 
 CFL = 0.8 ! O=4,Nsub=4
+CFL = 2.0
 if (Order == 2) then
 CFL = 2.0
 end if

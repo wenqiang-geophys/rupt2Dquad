@@ -80,11 +80,11 @@ subroutine RHS(mesh,u,uax,uay,uax2,uay2,qi,ru,ruax,ruay,ruax2,ruay2)
         !    1------2
         !       1
         u2d = reshape(u(:,ie,1:8),(/Ngrid,Ngrid,8/))
+        if (mesh%ispml(ie)==1 .and. use_pml==1) then
         uax2d = reshape(uax(:,ie,1:8),(/Ngrid,Ngrid,8/))
         uay2d = reshape(uay(:,ie,1:8),(/Ngrid,Ngrid,8/))
         uax22d = reshape(uax2(:,ie,1:8),(/Ngrid,Ngrid,8/))
         uay22d = reshape(uay2(:,ie,1:8),(/Ngrid,Ngrid,8/))
-        if (mesh%ispml(ie)==1 .and. use_pml==1) then
         do i=1,8
             !uax2d(:,:,i) = (u2d(:,:,i)+uax2d(:,:,i)+uax22d(:,:,i))/(mesh%pbx(:,:,ie)*mesh%pbx2(:,:,ie))
             !uay2d(:,:,i) = (u2d(:,:,i)+uay2d(:,:,i)+uay22d(:,:,i))/(mesh%pby(:,:,ie)*mesh%pby2(:,:,ie))
