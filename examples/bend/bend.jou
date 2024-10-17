@@ -1,0 +1,41 @@
+#!/usr/bin/env python
+
+reset
+
+#{_R=100e3}
+#{_angle=10/180.0*PI}
+#{_x1=20e3+20e3*cos(_angle)}
+#{_y1=20e3*sin(_angle)}
+#{_x2=_R*cos(_angle)}
+#{_y2=_R*sin(_angle)}
+
+create surface circle radius {_R} zplane
+
+create vertex {-_R} 0 0
+create vertex -40e3 0 0
+create vertex  20e3 0 0
+create vertex {_x1} {_y1} 0
+create vertex {_x2} {_y2} 0
+create curve vertex 2 3
+create curve vertex 3 4
+create curve vertex 4 5
+create curve vertex 5 6
+Partition Create Surface 1 Curve 2 3 4 5
+
+#surf all scheme  TriDelaunay
+surf all size 3.2e3
+#curve 3 4 size 400
+
+merge all
+mesh surf all
+
+refine curve 3 4 numsplit 4 bias 1 dep 1
+
+nodeset 1 curve 3 4
+sideset 1 curve 3 4
+nodeset 1 Name "Fault"
+sideset 1 Name "Fault"
+
+#export Abaqus "bend.inp" overwrite
+#export mesh "bend_minus10.exo" overwrite
+export mesh "bend_10.exo" overwrite

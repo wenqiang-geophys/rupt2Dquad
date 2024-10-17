@@ -1,0 +1,31 @@
+
+# configure file for dynamic rupture simulations 
+# in YAML format
+
+# number of processors
+nproc : 4
+# simulation time length (in seconds)
+simu_time_max : 30.0
+
+# mesh dir
+mesh_dir : data
+# output dir
+data_dir : data
+
+# 0 for upwind flux
+# 2 for mixed flux (default)
+flux_method : 2
+
+# snapshot output: skip every N steps
+wave_snap_skip : 200
+fault_snap_skip   : 2
+grdsurf_snap_skip : 2
+
+# Forced rupture when t < t0, r < rcrit
+# turn on/off the ForcedRup
+ForcedRup : 1
+ForcedRup_x0 : 0
+ForcedRup_y0 : 0
+ForcedRup_rcrit : 4.0e3
+ForcedRup_Vr : 1.0e3
+ForcedRup_t0 : 0.5
