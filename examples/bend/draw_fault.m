@@ -23,7 +23,7 @@ for i = 1:nproc
     t = ncread(fnm, 'time');
 
     nt = length(t);
-    nt = 1400;
+    %nt = 1400;
     t = t(1:nt);
     v1 = v1(:,:,1:nt);
 
@@ -48,11 +48,13 @@ end
 
 
 figure
-%subplot(1,2,ii)
-%plot(x(:), y(:), 'x')
+
+% for bending fault
+faultBendAngle = 10;
+% x(x>20) = 20+(x(x>20)-20)/cosd(faultBendAngle);
+
 pcolor(x,t, (v'))
 shading interp
-%caxis([0 3])
 c=colorbar;
 
 title(varnm)
