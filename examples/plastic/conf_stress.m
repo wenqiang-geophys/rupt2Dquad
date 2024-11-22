@@ -9,6 +9,9 @@ par = ReadYaml('parameters.yaml');
 nproc = par.nproc;
 mesh_dir = par.mesh_dir;
 ForcedRup = par.ForcedRup;
+Psi = par.SmaxAngle;
+
+tau = []; sig = []; xf = []; mu_1 = []; mu_2 = [];
 
 for iproc = 0:nproc-1
 
@@ -49,22 +52,12 @@ for iproc = 0:nproc-1
 
                     syy = -120e6;
                     sxy = 70e6;
+                    sxx = syy-2*sxy/tand(2*Psi);
                     if (ForcedRup == 0)
-                    if (abs(x+10e3)<1.5e3)
+                    if (abs(x)<1.5e3)
                         sxy = 81.6e6;
                     end
                     end
-                    sxx = 0e6;
-
-                    Phi = 60;
-                    sxx = syy-2*sxy/tand(2*Phi);
-
-                    %if (abs(x-7.5e3)<1.5e3)
-                    %    sxy = 60e6;
-                    %end
-                    %if (abs(x+7.5e3)<1.5e3)
-                    %    sxy = 80e6;
-                    %end
 
                     X(i,is,ief) = x;
 
@@ -72,10 +65,19 @@ for iproc = 0:nproc-1
                     Syy(i,is,ief) = syy;
                     Sxy(i,is,ief) = sxy;
 
-                    mu_s(i,is,ief) = 0.677;
-                    mu_d(i,is,ief) = 0.525;
-                    Dc(i,is,ief) = 0.4;
+                    mu_s1 = 0.677;
+                    mu_d1 = 0.525;
+
+                    mu_s(i,is,ief) = mu_s1;   % static friction
+                    mu_d(i,is,ief) = mu_d1;   % dynamic friciton
+                    Dc(i,is,ief) = 0.4;       % slip-weakening distance
                     C0(i,is,ief) = 0;
+
+                    tau = [tau,sxy];
+                    sig = [sig,syy];
+                    xf = [xf,x];
+                    mu_1 = [mu_1,mu_s1];
+                    mu_2 = [mu_2,mu_d1];
                 end
 
             end
@@ -107,3 +109,27 @@ for iproc = 0:nproc-1
 
 
 end
+
+% check initial settings for stresses and frictions
+[xf,idx] = sort(xf);
+tau = tau(idx);
+mu_1 = mu_1(idx);
+mu_2 = mu_2(idx);
+
+figure
+plot(xf,tau,'x-','LineWidth',1)
+hold on
+plot(xf,-sig,'o-','LineWidth',1)
+xlabel('X (m)')
+legend('\tau','-\sigma','Location','best','FontSize',20)
+ylabel('Initial Stress (Pa)')
+%print -dpng -r150 stress
+
+figure
+plot(xf,mu_1,'x-','LineWidth',1)
+hold on
+plot(xf,mu_2,'o-','LineWidth',1)
+xlabel('X (m)')
+legend('\mu_s','\mu_d','Location','best','FontSize',20)
+ylabel('Friction')
+%print -dpng -r150 friction

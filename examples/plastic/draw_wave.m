@@ -8,6 +8,10 @@ nproc = par.nproc;
 data_dir = par.data_dir;
 varnm = 'damage';
 %varnm = 'Vx';
+%data_dir = 'data_Psi9'
+data_dir = 'data_Psi20'
+%data_dir = 'data_Psi50'
+data_dir = 'data'
 
 [x,y,tvec] = gather_wave_coord(data_dir, nproc);
 nt = length(tvec);
@@ -26,7 +30,7 @@ for it = 1:1:nt
     [v1,t] = gather_wave_snap(data_dir, nproc, varnm, it);
 
     if strcmp(varnm, 'damage')
-        v1(v1==0)=1e-16;
+        %v1(v1<1e-16)=1e-16;
         v1 = log10(v1);
     end
     vmax = max(abs(v1(:)));
@@ -43,10 +47,12 @@ for it = 1:1:nt
     vmax = max(vmax,1e-16);
     %caxis([-1 1]*vmax/2)
     title(['T = ',num2str(t),' sec'])
+    cb = colorbar;
+    title(cb,'log_{10}\eta')
 
-    axis([-30 30 -10 10])
+    %axis([-41 41  -10 10])
     if strcmp(varnm, 'damage')
-        caxis([-8 -5])
+       caxis([-8 -6])
     end
     hold on
     %plot3([-15 15],[0 0],[1 1]*1e30,'k','LineWidth',1.5)

@@ -5,7 +5,7 @@
 # number of processors
 nproc : 4
 # simulation time length (in seconds)
-simu_time_max : 12.0
+simu_time_max : 15.0
 
 # mesh dir
 mesh_dir : data
@@ -13,21 +13,22 @@ mesh_dir : data
 data_dir : data
 
 plasticity : 1
-cohesion : 0
-blkfric : 0.85
-SmaxAngle : 45
-Tvisc : 0.05
+cohesion   : 0
+blkfric    : 0.980196058819607
+# Bulk friction v = 0.980196058819607
+# μ = sin(atan(v)) = 0.7
+SmaxAngle  : 9
+Tvisc      : 0.3
 
 # snapshot output: skip every N steps
-wave_snap_skip : 50
+wave_snap_skip    : 50
 fault_snap_skip   : 2
 grdsurf_snap_skip : 2
 
-
 # Forced rupture when t < t0, r < rcrit
-ForcedRup : 0
-ForcedRup_x0 : -10.0e3
-ForcedRup_y0 : 0
-ForcedRup_rcrit : 4.0e3
-ForcedRup_Vr : 2.0e3
-ForcedRup_t0 : 0.5
+ForcedRup       : 1
+ForcedRup_x0    : 0.0
+ForcedRup_y0    : 0.0
+ForcedRup_rcrit : 5.0e3
+ForcedRup_Vr    : 1.0e3
+ForcedRup_t0    : 0.5

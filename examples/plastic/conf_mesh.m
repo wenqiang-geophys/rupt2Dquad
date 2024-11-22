@@ -31,14 +31,16 @@ end
 elem = ccw_sort(node,elem'); elem = elem';
 
 fault_bdr_list = [1];
-%elem_fault = [];
+elem_fault = [];
 bc1 = zeros(4,Nelem);
 for i = 1:length(fault_bdr_list)
     elem1 = ncread(fnm,['connect',num2str(fault_bdr_list(i))]);
+    elem_fault = cat(2,elem_fault,elem1);
     bc2 = set_bctype_from_curve(elem,elem1,BC_FAULT+(i-1));
     bc1 = bc1 + bc2;
 end
 bctype = bc1;
+fnodes = elem_fault;
 
 %elem = elem'; % Nelem x 4
 
@@ -50,6 +52,7 @@ elem = mesh.elem;
 node = mesh.node;
 
 fluxtype = zeros(4,Nelem);
+fluxtype = set_fluxtype_quad(elem, fnodes);
 elemtype = zeros(1,Nelem);
 elemtype(:) = ELEM_SOLID;
 vp = zeros(1,Nelem);
