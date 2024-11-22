@@ -76,4 +76,4 @@ db = gen_mesh_mpi_v6(mesh, nproc);
 
 %% check local node and elem ...
 
-check_mesh
+check_mesh(mesh)
