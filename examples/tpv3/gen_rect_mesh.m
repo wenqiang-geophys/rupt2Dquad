@@ -4,11 +4,11 @@ myconstants;
 
 dx = 200;
 dy1 = 200;
-dy2 = 3*dy1;
+dy2 = 1*dy1;
 
 nx = 100;
 ny1 = 60;
-ny2 = ny1/3;
+ny2 = ny1/1;
 
 Nx = 2*nx+1;
 Ny = ny1+ny2+1;
@@ -18,24 +18,38 @@ for i = -nx:nx
     for j = -ny1:ny2
         if (j > 0)
             dy = dy2;
-            X(i+nx+1,j+ny1+1) = dx*i+dy*j*0;
-            Y(i+nx+1,j+ny1+1) = dy*j;
         else
             dy = dy1;
-            X(i+nx+1,j+ny1+1) = dx*i;
-            Y(i+nx+1,j+ny1+1) = dy*j;
         end
+        X(i+nx+1,j+ny1+1) = dx*i;
+        Y(i+nx+1,j+ny1+1) = dy*j;
     end
 end
 
+for i = -nx:nx
+    for j = 1:ny2
+        dy = dy2;
+        x = dx*i+dy*j*0;
+        y0 = dy*j;
+        X(i+nx+1,j+ny1+1) = x;
+        dymin = dy2;
+        dymax = 2*dy2;
+        amp = (1+cos(x*2*pi/5e3))/2; % 0~1
+        damp = exp(-(y0/2e3).^2);
+        dy = dymin+damp*amp*(dymax-dymin);
+        Y(i+nx+1,j+ny1+1) = dy+Y(i+nx+1,j+ny1);
+    end
+end
+
+
 if 0
-figure
-pcolor(X*1e-3,Y*1e-3,zeros(size(X)))
-axis image
-caxis([-1e30 0])
-colormap gray
-xlabel('X (km)')
-ylabel('Y (km)')
+    figure
+    pcolor(X*1e-3,Y*1e-3,zeros(size(X)))
+    axis image
+    caxis([-1e30 0])
+    colormap gray
+    xlabel('X (km)')
+    ylabel('Y (km)')
 end
 
 Nnode = Nx*Ny;
@@ -50,7 +64,7 @@ for i = 1:Nx
         node(2,in) = Y(i,j);
     end
 end
-        
+
 for i = 1:Nx-1
     for j = 1:Ny-1
         ie = i+(j-1)*(Nx-1);

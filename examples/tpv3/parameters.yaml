@@ -5,14 +5,14 @@
 # number of processors
 nproc : 4
 # simulation time length (in seconds)
-simu_time_max : 10.0
+simu_time_max : 15.0
 
 # mesh dir
 mesh_dir : data
 # output dir
 data_dir : data
 
-#flux_method : 0
+flux_method : 0
 
 #cfl_number : 1.0
 

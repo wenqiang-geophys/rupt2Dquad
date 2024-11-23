@@ -13,7 +13,7 @@ data_dir = par.data_dir;
 
 fnm = 'tpv5_2d.exo';
 %fnm = 'tpv5_2d_circ.exo';
-%fnm = 'tpv5_2d_symm.exo';
+fnm = 'tpv5_2d_asymm.exo';
 coord = ncread(fnm,'coord');
 node = coord(:,1:2);
 
@@ -26,7 +26,7 @@ node = coord(:,1:2);
 
 quad_list = [6];
 %quad_list = [3];
-%quad_list = [10];
+quad_list = [10];
 elem = [];
 for i = 1:length(quad_list)
     elem1 = ncread(fnm,['connect',num2str(quad_list(i))]);
@@ -49,7 +49,7 @@ bctype = bc1;
 fnodes = elem_fault;
 
 
-if 0
+if 1
 [node,elem,bctype ] = gen_rect_mesh;
 Nelem = size(elem,2);
 Nnode = size(node,2);
@@ -66,7 +66,7 @@ elem = mesh.elem;
 node = mesh.node;
 
 fluxtype = zeros(4,Nelem);
-fluxtype = set_fluxtype_quad(elem, fnodes);
+%fluxtype = set_fluxtype_quad(elem, fnodes);
 elemtype = zeros(1,Nelem);
 elemtype(:) = ELEM_SOLID;
 vp = zeros(1,Nelem);
