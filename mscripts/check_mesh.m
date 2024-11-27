@@ -4,6 +4,9 @@ node = m.node;
 bctype = m.bctype;
 c = m.vs; % color
 
+rx = m.body_recv_x;
+ry = m.body_recv_y;
+
 myconstants
 
 figure
@@ -27,6 +30,7 @@ for ie = 1:size(elem,2)
         end
     end
 end
+plot(rx, ry, 'bx', 'linewidth', 1)
 
 hold off
 axis image;

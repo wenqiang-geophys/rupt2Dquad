@@ -234,10 +234,10 @@ print*,'fault_snap_skip = ',fault_snap_skip, &
 !    write(filename,'(a,i6.6,a)') 'data/recv_id',mesh%recv_fid(i),'.txt'
 !    open(100+i,file=trim(filename))
 !enddo
-!do i = 1,mesh%body_nrecv
-!    write(filename,'(a,i6.6,a)') 'data/body_recv_id',mesh%body_recv_fid(i),'.txt'
-!    open(900+i,file=trim(filename))
-!enddo
+do i = 1,mesh%body_nrecv
+    write(filename,'(a,i6.6,a)') 'data/body_recv_',mesh%body_recv_fid(i),'.txt'
+    open(900+i,file=trim(filename))
+enddo
 
 !do i = 1,mesh%nelem
 !    do is = 1,nsurface
@@ -514,23 +514,23 @@ do it = 1,nt
     !    !write(100+irecv,*) mesh%current_time,mesh%recv_buffer(irecv,1:3)
 
     !end do
-    !do irecv = 1,mesh%body_nrecv
-    !    tmpu1 = 0
-    !    tmpu2 = 0
-    !    do i = 1,Ngrid
-    !        do j = 1,Ngrid
-    !            li=lagrange_basis(Ngrid,i,mesh%body_recv_refx(irecv),mesh%xnode)
-    !            lj=lagrange_basis(Ngrid,j,mesh%body_recv_refy(irecv),mesh%xnode)
-    !            tmpu1 = tmpu1 + wave%u(i+(j-1)*Ngrid,mesh%body_recv_ie(irecv),1)*li*lj
-    !            tmpu2 = tmpu2 + wave%u(i+(j-1)*Ngrid,mesh%body_recv_ie(irecv),2)*li*lj
-    !        end do
-    !    end do
-    !    !tmpu1 = tmpu1 / mesh%rho(mesh%body_recv_ie(irecv))
-    !    !tmpu2 = tmpu2 / mesh%rho(mesh%body_recv_ie(irecv))
-    !    write(900+irecv,*) mesh%current_time,&
-    !        tmpu1,tmpu2
-    !        !u(mesh%body_recv_i(irecv),mesh%body_recv_j(irecv),mesh%body_recv_ie(irecv),1:2)
-    !end do
+    do irecv = 1,mesh%body_nrecv
+        tmpu1 = 0
+        tmpu2 = 0
+        do i = 1,Ngrid
+            do j = 1,Ngrid
+                li=lagrange_basis(Ngrid,i,mesh%body_recv_refx(irecv),mesh%xnode)
+                lj=lagrange_basis(Ngrid,j,mesh%body_recv_refy(irecv),mesh%xnode)
+                tmpu1 = tmpu1 + wave%u(i+(j-1)*Ngrid,mesh%body_recv_ie(irecv),1)*li*lj
+                tmpu2 = tmpu2 + wave%u(i+(j-1)*Ngrid,mesh%body_recv_ie(irecv),2)*li*lj
+            end do
+        end do
+        tmpu1 = tmpu1 / mesh%rho(mesh%body_recv_ie(irecv))
+        tmpu2 = tmpu2 / mesh%rho(mesh%body_recv_ie(irecv))
+        write(900+irecv,*) mesh%current_time,&
+            tmpu1,tmpu2
+            !u(mesh%body_recv_i(irecv),mesh%body_recv_j(irecv),mesh%body_recv_ie(irecv),1:2)
+    end do
 
     !do i = 1,mesh%nelem
     !    do is = 1,nsurface
@@ -606,9 +606,9 @@ call MPI_Barrier(MPI_COMM_WORLD,ierr)
 !do i = 1,mesh%nrecv
 !    close(100+i)
 !end do
-!do i = 1,mesh%body_nrecv
-!    close(900+i)
-!end do
+do i = 1,mesh%body_nrecv
+    close(900+i)
+end do
 
 call MPI_Finalize(ierr)
 

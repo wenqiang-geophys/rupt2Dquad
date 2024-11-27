@@ -422,24 +422,28 @@ end
 %    end
 %end
 %% body recvs
-%nrecv = mesh.body_nrecv;
-%for iproc = 1:nproc
-%    db(iproc).body_recv_number = 0;
-%    k = 0;
-%    for i = 1:nrecv
-%        ie = mesh.body_recv_ie(i);
-%        if (part(ie)== iproc)
-%            k = k + 1;
-%            db(iproc).body_recv_fid(k)=i;
-%            db(iproc).body_recv_i(k)=mesh.body_recv_i(i);
-%            db(iproc).body_recv_j(k)=mesh.body_recv_j(i);
-%            db(iproc).body_recv_refx(k)=mesh.body_recv_refx(i);
-%            db(iproc).body_recv_refy(k)=mesh.body_recv_refy(i);
-%            db(iproc).body_recv_ie(k)= glob2loc_elmnts(ie);
-%        end
-%        db(iproc).body_recv_number = k;
-%    end
-%end
+if isfield(mesh,'body_nrecv')
+nrecv = mesh.body_nrecv;
+for iproc = 1:nproc
+    db(iproc).body_recv_number = 0;
+    k = 0;
+    for i = 1:nrecv
+        ie = mesh.body_recv_ie(i);
+        if (part(ie) == iproc)
+            k = k + 1;
+            db(iproc).body_recv_fid(k)=i;
+            db(iproc).body_recv_x(k)=mesh.body_recv_x(i);
+            db(iproc).body_recv_y(k)=mesh.body_recv_y(i);
+            db(iproc).body_recv_i(k)=mesh.body_recv_i(i);
+            db(iproc).body_recv_j(k)=mesh.body_recv_j(i);
+            db(iproc).body_recv_refx(k)=mesh.body_recv_refx(i);
+            db(iproc).body_recv_refy(k)=mesh.body_recv_refy(i);
+            db(iproc).body_recv_ie(k)= glob2loc_elmnts(ie);
+        end
+        db(iproc).body_recv_number = k;
+    end
+end
+end
 
 % counting fault elems
 for iproc = 1:nproc
@@ -535,16 +539,20 @@ end
 
 for iproc = 1:nproc
     fnm = sprintf('data/meshVar%06d.nc',iproc-1);
-    ncid = netcdf.create(fnm,'CLOBBER');
+    system(['rm -rf ', fnm]);
+    ncid = netcdf.create(fnm,'NETCDF4');
     dimid_node = netcdf.defDim(ncid,'Nnode',db(iproc).Nnode);
     dimid_elem = netcdf.defDim(ncid,'Nelem',db(iproc).Nelem);
     dimid_fault_elem = netcdf.defDim(ncid,'Nelem_fault',db(iproc).Nelem_fault);
-
+    if isfield(mesh,'body_nrecv')
+    dimid_recv = netcdf.defDim(ncid,'Nrecv',db(iproc).body_recv_number);
+    end
     dimid2 = netcdf.defDim(ncid,'two',2);
     dimid3 = netcdf.defDim(ncid,'three',3);
     dimid4 = netcdf.defDim(ncid,'four',4);
     dimid_face = netcdf.defDim(ncid,'Nfaces',4);
     dimid_vertex = netcdf.defDim(ncid,'Nvertex',4);
+
     dimid_mpi_nn = netcdf.defDim(ncid,'mpi_nn',db(iproc).mpi_nn);
     dimid_mpi_ne = netcdf.defDim(ncid,'mpi_ne',db(iproc).mpi_ne);
     dimid_mpi_mx = netcdf.defDim(ncid,'mpi_nemax',db(iproc).mpi_nemax);
@@ -577,6 +585,18 @@ for iproc = 1:nproc
     varid20 = netcdf.defVar(ncid,'b'     ,'NC_DOUBLE',[dimid2,dimid_face,dimid_fault_elem]);
     varid21 = netcdf.defVar(ncid,'Vw'    ,'NC_DOUBLE',[dimid2,dimid_face,dimid_fault_elem]);
     varid22 = netcdf.defVar(ncid,'state' ,'NC_DOUBLE',[dimid2,dimid_face,dimid_fault_elem]);
+    % recv
+    if isfield(mesh,'body_nrecv')
+    varid34 = netcdf.defVar(ncid,'body_recv_fid' ,'NC_INT'   ,[dimid_recv]);
+    varid35 = netcdf.defVar(ncid,'body_recv_ie'  ,'NC_INT'   ,[dimid_recv]);
+    varid36 = netcdf.defVar(ncid,'body_recv_i'   ,'NC_INT'   ,[dimid_recv]);
+    varid37 = netcdf.defVar(ncid,'body_recv_j'   ,'NC_INT'   ,[dimid_recv]);
+    varid38 = netcdf.defVar(ncid,'body_recv_x'   ,'NC_DOUBLE',[dimid_recv]);
+    varid39 = netcdf.defVar(ncid,'body_recv_y'   ,'NC_DOUBLE',[dimid_recv]);
+    varid40 = netcdf.defVar(ncid,'body_recv_refx','NC_DOUBLE',[dimid_recv]);
+    varid41 = netcdf.defVar(ncid,'body_recv_refy','NC_DOUBLE',[dimid_recv]);
+    end
+
     % mpi
     varid23 = netcdf.defVar(ncid,'mpi_rho','NC_DOUBLE',[dimid_mpi_pf,dimid3]);
     varid24 = netcdf.defVar(ncid,'mpi_vp' ,'NC_DOUBLE',[dimid_mpi_pf,dimid3]);
@@ -598,6 +618,18 @@ for iproc = 1:nproc
     netcdf.putVar(ncid,varid9,db(iproc).rho);
     netcdf.putVar(ncid,varid10,db(iproc).vp);
     netcdf.putVar(ncid,varid11,db(iproc).vs);
+
+    if isfield(mesh,'body_nrecv') && db(iproc).body_recv_number > 0
+    netcdf.putVar(ncid,varid34,db(iproc).body_recv_fid);
+    netcdf.putVar(ncid,varid35,db(iproc).body_recv_ie);
+    netcdf.putVar(ncid,varid36,db(iproc).body_recv_i);
+    netcdf.putVar(ncid,varid37,db(iproc).body_recv_j);
+    netcdf.putVar(ncid,varid38,db(iproc).body_recv_x);
+    netcdf.putVar(ncid,varid39,db(iproc).body_recv_y);
+    netcdf.putVar(ncid,varid40,db(iproc).body_recv_refx);
+    netcdf.putVar(ncid,varid41,db(iproc).body_recv_refy);
+    end
+
     if (db(iproc).Nelem_fault > 0)
         netcdf.putVar(ncid,varid32,db(iproc).fault2wave);
     end

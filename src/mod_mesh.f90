@@ -317,6 +317,12 @@ subroutine readMeshVar(this,myrank,nproc)
     ierr = nf90_inquire_dimension(ncid,dimid,namestr,this%ncoord)
     call check2(ierr, 'inquire_dimension Node')
 
+    ierr = nf90_inq_dimid(ncid,'Nrecv',dimid)
+    call check2(ierr, 'inq_dimid Nrecv')
+
+    ierr = nf90_inquire_dimension(ncid,dimid,namestr,this%body_nrecv)
+    call check2(ierr, 'inquire_dimension Nrecv')
+
     if (nproc > 1) then
     ierr = nf90_inq_dimid(ncid,'mpi_nn',dimid)
     call check2(ierr, 'inq_dimid mpi_nn')
@@ -407,13 +413,13 @@ subroutine readMeshVar(this,myrank,nproc)
     !end if
 
     !read(27,*) this%body_nrecv
-    !if (this%body_nrecv > 0) then
-    !    allocate(this%body_recv_fid (this%body_nrecv))
-    !    allocate(this%body_recv_i   (this%body_nrecv))
-    !    allocate(this%body_recv_j   (this%body_nrecv))
-    !    allocate(this%body_recv_ie  (this%body_nrecv))
-    !    allocate(this%body_recv_refx(this%body_nrecv))
-    !    allocate(this%body_recv_refy(this%body_nrecv))
+    if (this%body_nrecv > 0) then
+        allocate(this%body_recv_fid (this%body_nrecv))
+        allocate(this%body_recv_i   (this%body_nrecv))
+        allocate(this%body_recv_j   (this%body_nrecv))
+        allocate(this%body_recv_ie  (this%body_nrecv))
+        allocate(this%body_recv_refx(this%body_nrecv))
+        allocate(this%body_recv_refy(this%body_nrecv))
 
     !    read(27,*) this%body_recv_fid
     !    read(27,*) this%body_recv_i
@@ -421,7 +427,7 @@ subroutine readMeshVar(this,myrank,nproc)
     !    read(27,*) this%body_recv_ie
     !    read(27,*) this%body_recv_refx
     !    read(27,*) this%body_recv_refy
-    !end if
+    end if
     !close(27)
     ierr = nf90_inq_varid(ncid,'node',varid)
     call check2(ierr, 'inq_varid node')
@@ -488,6 +494,45 @@ subroutine readMeshVar(this,myrank,nproc)
 
     ierr = nf90_get_var(ncid,varid,this%vs)
     call check2(ierr, 'get_var vs')
+
+    if (this%body_nrecv > 0) then
+
+    ierr = nf90_inq_varid(ncid,'body_recv_fid',varid)
+    call check2(ierr, 'inq_varid body_recv_fid')
+
+    ierr = nf90_get_var(ncid,varid,this%body_recv_fid)
+    call check2(ierr, 'get_var body_recv_fid')
+
+    ierr = nf90_inq_varid(ncid,'body_recv_ie',varid)
+    call check2(ierr, 'inq_varid body_recv_ie')
+
+    ierr = nf90_get_var(ncid,varid,this%body_recv_ie)
+    call check2(ierr, 'get_var body_recv_ie')
+
+    ierr = nf90_inq_varid(ncid,'body_recv_i',varid)
+    call check2(ierr, 'inq_varid body_recv_i')
+
+    ierr = nf90_get_var(ncid,varid,this%body_recv_i)
+    call check2(ierr, 'get_var body_recv_i')
+
+    ierr = nf90_inq_varid(ncid,'body_recv_j',varid)
+    call check2(ierr, 'inq_varid body_recv_j')
+
+    ierr = nf90_get_var(ncid,varid,this%body_recv_j)
+    call check2(ierr, 'get_var body_recv_j')
+
+    ierr = nf90_inq_varid(ncid,'body_recv_refx',varid)
+    call check2(ierr, 'inq_varid body_recv_refx')
+
+    ierr = nf90_get_var(ncid,varid,this%body_recv_refx)
+    call check2(ierr, 'get_var body_recv_refx')
+
+    ierr = nf90_inq_varid(ncid,'body_recv_refy',varid)
+    call check2(ierr, 'inq_varid body_recv_refy')
+
+    ierr = nf90_get_var(ncid,varid,this%body_recv_refy)
+    call check2(ierr, 'get_var body_recv_refy')
+    end if
 
   if (nproc > 1) then
   ierr = nf90_inq_varid(ncid,'mpi_neighbor',varid)
