@@ -14,12 +14,18 @@ nproc = par.nproc;
 data_dir = par.data_dir;
 
 fnm = 'tpv5_2d.exo';
- 
-coord = ncread(fnm,'coord');
+try
+    coord = ncread(fnm,'coord');
+catch
+    coordx = ncread(fnm,'coordx');
+    coordy = ncread(fnm,'coordy');
+    coordz = ncread(fnm,'coordz');
+    coord = [coordx,coordy,coordz];
+end
 node = coord(:,1:2);
 Nnode = size(node,1);
 
-quad_list = [6];
+quad_list = [1];
  
 %quad_list = [10];
 elem = [];
@@ -31,17 +37,24 @@ end
 
 elem = ccw_sort(node,elem'); elem = elem';
 
-fault_bdr_list = [1];
-elem_fault = [];
-bc1 = zeros(4,Nelem);
-for i = 1:length(fault_bdr_list)
-    elem1 = ncread(fnm,['connect',num2str(fault_bdr_list(i))]);
+if 0
+    % use gmsh
+    fault_bdr_list = [1];
+    elem_fault = [];
+    bc1 = zeros(4,Nelem);
+    for i = 1:length(fault_bdr_list)
+        elem1 = ncread(fnm,['connect',num2str(fault_bdr_list(i))]);
         elem_fault = cat(2,elem_fault,elem1);
-    bc2 = set_bctype_from_curve(elem,elem1,BC_FAULT+(i-1));
-    bc1 = bc1 + bc2;
+        bc2 = set_bctype_from_curve(elem,elem1,BC_FAULT+(i-1));
+        bc1 = bc1 + bc2;
+    end
+    fnodes = elem_fault;
+else
+    % use cubit
+    fnodes = ncread(fnm,['node_ns1']);
+    bc1 = set_bctype_from_nodes(elem,fnodes,BC_FAULT+(i-1));
 end
 bctype = bc1;
-fnodes = elem_fault;
 
 %elem = elem'; % Nelem x 4
 
@@ -82,7 +95,6 @@ recv_x = [];
 recv_y = [];
 end
 
- 
 recv_i = zeros(nrecv,1);
 recv_j = zeros(nrecv,1);
 recv_ie = zeros(nrecv,1);

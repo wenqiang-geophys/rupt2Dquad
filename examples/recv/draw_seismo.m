@@ -18,3 +18,4 @@ for fid = id_list
 end
 
 xlabel('Time (sec)')
+ylabel('Vy (m/s)')

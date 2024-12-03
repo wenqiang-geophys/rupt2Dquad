@@ -1,0 +1,29 @@
+#!/usr/bin/env python
+
+reset
+
+create surface rectangle width 200e3 height 120e3 zplane
+
+create vertex -40e3 0 0
+create vertex  40e3 0 0
+create curve vertex 5 6
+Partition Create Surface 1 Curve 5
+
+#surf all scheme map
+surf all size 3.2e3
+#curve 5 size 400
+
+merge all
+mesh surf all
+
+refine curve 5 numsplit 4 bias 1 dep 2
+
+nodeset 1 curve 5
+sideset 1 curve 5
+nodeset 1 Name "Fault"
+sideset 1 Name "Fault"
+
+#export Abaqus "bend.inp" overwrite
+#export mesh "bend_minus10.exo" overwrite
+export Abaqus "tpv5_2d.inp" overwrite
+export mesh "tpv5_2d.exo" overwrite
