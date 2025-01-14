@@ -11,7 +11,7 @@ module mod_io_wave
   integer :: wave_varid(20)
 
   !real(kind=rkind),allocatable,dimension(:,:) :: x,y
-  real(kind=rkind),allocatable,dimension(:,:,:) :: Vx,Vy,eta
+  real(kind=rkind),allocatable,dimension(:,:,:) :: Vx,Vy,exx,eyy,exy,eta
 
 contains
 
@@ -34,6 +34,9 @@ subroutine wave_io_init(mesh)
   allocate( y(Ngrid,Ngrid,mesh%nelem))
   allocate(Vx(Ngrid,Ngrid,mesh%nelem))
   allocate(Vy(Ngrid,Ngrid,mesh%nelem))
+  allocate(exx(Ngrid,Ngrid,mesh%nelem))
+  allocate(eyy(Ngrid,Ngrid,mesh%nelem))
+  allocate(exy(Ngrid,Ngrid,mesh%nelem))
   allocate(eta(Ngrid,Ngrid,mesh%nelem))
   do ie = 1,mesh%nelem
     do i = 1,Ngrid
@@ -71,6 +74,12 @@ subroutine wave_io_init(mesh)
   call check2(ierr,'def_var Vx')
   ierr = nf90_def_var(wave_ncid, "Vy", NF90_FLOAT, dimid(1:4), wave_varid(2))
   call check2(ierr,'def_var Vy')
+  ierr = nf90_def_var(wave_ncid, "exx", NF90_FLOAT, dimid(1:4), wave_varid(6))
+  call check2(ierr,'def_var exx')
+  ierr = nf90_def_var(wave_ncid, "eyy", NF90_FLOAT, dimid(1:4), wave_varid(7))
+  call check2(ierr,'def_var eyy')
+  ierr = nf90_def_var(wave_ncid, "exy", NF90_FLOAT, dimid(1:4), wave_varid(8))
+  call check2(ierr,'def_var exy')
 
   ierr = nf90_def_var(wave_ncid, "damage", NF90_FLOAT, dimid(1:4), wave_varid(5))
   call check2(ierr,'def_var eta')
@@ -102,6 +111,9 @@ subroutine wave_io_save(mesh,wave,it)
       do i = 1,Ngrid
         Vx(i,j,ie) = sngl( wave%u(i+(j-1)*Ngrid,ie,1)/mesh%rho(ie) )
         Vy(i,j,ie) = sngl( wave%u(i+(j-1)*Ngrid,ie,2)/mesh%rho(ie) )
+        exx(i,j,ie) = sngl( wave%u(i+(j-1)*Ngrid,ie,3) )
+        eyy(i,j,ie) = sngl( wave%u(i+(j-1)*Ngrid,ie,4) )
+        exy(i,j,ie) = sngl( wave%u(i+(j-1)*Ngrid,ie,5) )
         eta(i,j,ie) = sngl( wave%damage(i,j,ie) )
       enddo
     enddo
@@ -112,6 +124,12 @@ subroutine wave_io_save(mesh,wave,it)
   call check2(ierr,'put_var Vx')
   ierr = nf90_put_var(wave_ncid,wave_varid(2),Vy,start,cnt,stride)
   call check2(ierr,'put_var Vy')
+  ierr = nf90_put_var(wave_ncid,wave_varid(6),exx,start,cnt,stride)
+  call check2(ierr,'put_var exx')
+  ierr = nf90_put_var(wave_ncid,wave_varid(7),eyy,start,cnt,stride)
+  call check2(ierr,'put_var eyy')
+  ierr = nf90_put_var(wave_ncid,wave_varid(8),exy,start,cnt,stride)
+  call check2(ierr,'put_var exy')
   ierr = nf90_put_var(wave_ncid,wave_varid(5),eta,start,cnt,stride)
   call check2(ierr,'put_var eta')
 
